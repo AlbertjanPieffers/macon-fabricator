@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ProductPreview } from '@/components/ProductPreview';
 
 export const ProductCreator = () => {
   const [selectedProfile, setSelectedProfile] = useState('IPE240');
@@ -210,49 +211,17 @@ export const ProductCreator = () => {
         <div className="space-y-6">
           <Card className="macon-card">
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
-                Product Preview
-                <div className="flex items-center gap-2">
-                  <Button variant="ghost" size="sm">
-                    <Grid className="w-4 h-4" />
-                  </Button>
-                  <Button variant="ghost" size="sm">
-                    <Maximize className="w-4 h-4" />
-                  </Button>
-                </div>
-              </CardTitle>
+              <CardTitle>Product Preview</CardTitle>
             </CardHeader>
             <CardContent>
-              <Tabs defaultValue="2d" className="w-full">
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="2d" className="macon-tab">2D View</TabsTrigger>
-                  <TabsTrigger value="3d" className="macon-tab">3D View</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="2d" className="mt-4">
-                  <div className="bg-white border border-border rounded-lg h-80 flex items-center justify-center">
-                    <div className="text-center text-muted-foreground">
-                      <div className="w-12 h-12 mx-auto mb-2 bg-primary/10 rounded-lg flex items-center justify-center">
-                        <Grid className="w-6 h-6 text-primary" />
-                      </div>
-                      <p className="text-sm">2D Profile Preview</p>
-                      <p className="text-xs">{selectedProfile} • {productData.length}mm</p>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="3d" className="mt-4">
-                  <div className="bg-white border border-border rounded-lg h-80 flex items-center justify-center">
-                    <div className="text-center text-muted-foreground">
-                      <div className="w-12 h-12 mx-auto mb-2 bg-primary/10 rounded-lg flex items-center justify-center">
-                        <Maximize className="w-6 h-6 text-primary" />
-                      </div>
-                      <p className="text-sm">3D Model Preview</p>
-                      <p className="text-xs">Interactive view with operations</p>
-                    </div>
-                  </div>
-                </TabsContent>
-              </Tabs>
+              <ProductPreview
+                profile={selectedProfile}
+                length={productData.length}
+                operations={[
+                  { type: 'Hole ⌀16mm', position: 500, size: 16 },
+                  { type: 'Cut 45° angle', position: parseInt(productData.length) - 100, angle: 45 }
+                ]}
+              />
             </CardContent>
           </Card>
 
