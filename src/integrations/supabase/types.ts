@@ -14,7 +14,244 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      batch_products: {
+        Row: {
+          batch_id: string
+          completed_quantity: number | null
+          created_at: string
+          id: string
+          product_id: string
+          quantity: number
+        }
+        Insert: {
+          batch_id: string
+          completed_quantity?: number | null
+          created_at?: string
+          id?: string
+          product_id: string
+          quantity?: number
+        }
+        Update: {
+          batch_id?: string
+          completed_quantity?: number | null
+          created_at?: string
+          id?: string
+          product_id?: string
+          quantity?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "batch_products_batch_id_fkey"
+            columns: ["batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "batch_products_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      batches: {
+        Row: {
+          batch_id: string
+          completed_parts: number | null
+          created_at: string
+          efficiency_percentage: number | null
+          estimated_completion_time: string | null
+          id: string
+          name: string
+          operator_name: string
+          priority: Database["public"]["Enums"]["priority_level"]
+          progress_percentage: number | null
+          quality_score_percentage: number | null
+          start_time: string | null
+          status: Database["public"]["Enums"]["batch_status"]
+          total_parts: number | null
+          updated_at: string
+        }
+        Insert: {
+          batch_id: string
+          completed_parts?: number | null
+          created_at?: string
+          efficiency_percentage?: number | null
+          estimated_completion_time?: string | null
+          id?: string
+          name: string
+          operator_name: string
+          priority?: Database["public"]["Enums"]["priority_level"]
+          progress_percentage?: number | null
+          quality_score_percentage?: number | null
+          start_time?: string | null
+          status?: Database["public"]["Enums"]["batch_status"]
+          total_parts?: number | null
+          updated_at?: string
+        }
+        Update: {
+          batch_id?: string
+          completed_parts?: number | null
+          created_at?: string
+          efficiency_percentage?: number | null
+          estimated_completion_time?: string | null
+          id?: string
+          name?: string
+          operator_name?: string
+          priority?: Database["public"]["Enums"]["priority_level"]
+          progress_percentage?: number | null
+          quality_score_percentage?: number | null
+          start_time?: string | null
+          status?: Database["public"]["Enums"]["batch_status"]
+          total_parts?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      machines: {
+        Row: {
+          created_at: string
+          current_batch_id: string | null
+          efficiency_percentage: number | null
+          id: string
+          last_maintenance: string | null
+          machine_name: string
+          machine_type: string
+          status: string
+          updated_at: string
+          uptime_hours: number | null
+        }
+        Insert: {
+          created_at?: string
+          current_batch_id?: string | null
+          efficiency_percentage?: number | null
+          id?: string
+          last_maintenance?: string | null
+          machine_name: string
+          machine_type: string
+          status?: string
+          updated_at?: string
+          uptime_hours?: number | null
+        }
+        Update: {
+          created_at?: string
+          current_batch_id?: string | null
+          efficiency_percentage?: number | null
+          id?: string
+          last_maintenance?: string | null
+          machine_name?: string
+          machine_type?: string
+          status?: string
+          updated_at?: string
+          uptime_hours?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "machines_current_batch_id_fkey"
+            columns: ["current_batch_id"]
+            isOneToOne: false
+            referencedRelation: "batches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_operations: {
+        Row: {
+          angle_value: number | null
+          created_at: string
+          id: string
+          operation_order: number
+          operation_type: string
+          position_mm: number
+          product_id: string
+          size_value: number | null
+        }
+        Insert: {
+          angle_value?: number | null
+          created_at?: string
+          id?: string
+          operation_order?: number
+          operation_type: string
+          position_mm: number
+          product_id: string
+          size_value?: number | null
+        }
+        Update: {
+          angle_value?: number | null
+          created_at?: string
+          id?: string
+          operation_order?: number
+          operation_type?: string
+          position_mm?: number
+          product_id?: string
+          size_value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_operations_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          created_at: string
+          data3: string | null
+          data5: string | null
+          data6: string | null
+          estimated_cut_time_seconds: number | null
+          id: string
+          length_mm: number
+          name: string
+          nc_file_generated: boolean | null
+          operations_count: number | null
+          priority: number | null
+          product_id: string
+          profile: Database["public"]["Enums"]["product_profile"]
+          status: Database["public"]["Enums"]["product_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data3?: string | null
+          data5?: string | null
+          data6?: string | null
+          estimated_cut_time_seconds?: number | null
+          id?: string
+          length_mm: number
+          name: string
+          nc_file_generated?: boolean | null
+          operations_count?: number | null
+          priority?: number | null
+          product_id: string
+          profile: Database["public"]["Enums"]["product_profile"]
+          status?: Database["public"]["Enums"]["product_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data3?: string | null
+          data5?: string | null
+          data6?: string | null
+          estimated_cut_time_seconds?: number | null
+          id?: string
+          length_mm?: number
+          name?: string
+          nc_file_generated?: boolean | null
+          operations_count?: number | null
+          priority?: number | null
+          product_id?: string
+          profile?: Database["public"]["Enums"]["product_profile"]
+          status?: Database["public"]["Enums"]["product_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +260,22 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      batch_status:
+        | "Draft"
+        | "Queued"
+        | "Running"
+        | "Paused"
+        | "Completed"
+        | "Error"
+      priority_level: "Low" | "Medium" | "High" | "Critical"
+      product_profile:
+        | "IPE240"
+        | "IPE300"
+        | "HEB200"
+        | "HEB300"
+        | "L80x80"
+        | "L100x100"
+      product_status: "Draft" | "Ready" | "Processing" | "Complete"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +402,25 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      batch_status: [
+        "Draft",
+        "Queued",
+        "Running",
+        "Paused",
+        "Completed",
+        "Error",
+      ],
+      priority_level: ["Low", "Medium", "High", "Critical"],
+      product_profile: [
+        "IPE240",
+        "IPE300",
+        "HEB200",
+        "HEB300",
+        "L80x80",
+        "L100x100",
+      ],
+      product_status: ["Draft", "Ready", "Processing", "Complete"],
+    },
   },
 } as const
