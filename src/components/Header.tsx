@@ -1,5 +1,6 @@
-import { Settings, Database, Cpu } from 'lucide-react';
+import { Settings, Database, Cpu, LogOut, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface HeaderProps {
   onNavigate: (view: string) => void;
@@ -7,6 +8,8 @@ interface HeaderProps {
 }
 
 export const Header = ({ onNavigate, currentView }: HeaderProps) => {
+  const { user, signOut } = useAuth();
+  
   const navItems = [
     { id: 'home', label: 'Home', icon: null },
     { id: 'products', label: 'Product Creator', icon: null },
@@ -14,6 +17,10 @@ export const Header = ({ onNavigate, currentView }: HeaderProps) => {
     { id: 'machine', label: 'Machine Overview', icon: Cpu },
     { id: 'settings', label: 'Settings', icon: Settings },
   ];
+
+  const handleSignOut = async () => {
+    await signOut();
+  };
 
   return (
     <header className="bg-card border-b border-border">
@@ -47,9 +54,20 @@ export const Header = ({ onNavigate, currentView }: HeaderProps) => {
             <div className="w-2 h-2 bg-green-500 rounded-full"></div>
             PLC Connected
           </div>
+          
+          <div className="flex items-center gap-2 text-sm">
+            <User className="w-4 h-4" />
+            <span className="text-muted-foreground">{user?.email}</span>
+          </div>
+          
           <Button variant="outline" size="sm" className="gap-2">
             <Database className="w-4 h-4" />
             Backup
+          </Button>
+          
+          <Button variant="outline" size="sm" className="gap-2" onClick={handleSignOut}>
+            <LogOut className="w-4 h-4" />
+            Sign Out
           </Button>
         </div>
       </div>
