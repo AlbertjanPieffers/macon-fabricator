@@ -7,30 +7,49 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ProductPreview } from '@/components/ProductPreview';
+import { useCreateProduct, useUpdateProduct, type ProductProfile, type ProductStatus } from '@/hooks/useProducts';
 
 export const ProductCreator = () => {
-  const [selectedProfile, setSelectedProfile] = useState('IPE240');
+  const createProduct = useCreateProduct();
+  const updateProduct = useUpdateProduct();
+  
+  const [selectedProfile, setSelectedProfile] = useState<ProductProfile>('IPE240');
   const [productData, setProductData] = useState({
-    data1: 'P001',
-    data2: 'New Product',
+    product_id: 'P001',
+    name: 'New Product',
     data3: '',
-    data4: '6000',
+    length_mm: '6000',
     data5: '',
     data6: '',
-    data7: '',
-    data8: 'Draft',
-    data9: '1',
-    data10: '',
-    data11: '',
-    data12: '',
-    profile: 'IPE240',
-    length: '6000'
+    status: 'Draft' as ProductStatus,
+    priority: '1',
+    profile: 'IPE240' as ProductProfile,
   });
 
-  const profiles = ['IPE240', 'IPE300', 'HEB200', 'HEB300', 'L80x80', 'L100x100'];
+  const profiles: ProductProfile[] = ['IPE240', 'IPE300', 'HEB200', 'HEB300', 'L80x80', 'L100x100'];
 
   const updateField = (field: string, value: string) => {
     setProductData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleSave = async () => {
+    try {
+      await createProduct.mutateAsync({
+        product_id: productData.product_id,
+        name: productData.name,
+        profile: selectedProfile,
+        length_mm: parseInt(productData.length_mm),
+        status: productData.status,
+        priority: parseInt(productData.priority),
+        data3: productData.data3,
+        data5: productData.data5,
+        data6: productData.data6,
+        operations_count: 0,
+        nc_file_generated: false,
+      });
+    } catch (error) {
+      console.error('Failed to save product:', error);
+    }
   };
 
   return (
@@ -38,9 +57,9 @@ export const ProductCreator = () => {
       {/* Toolbar */}
       <div className="macon-toolbar">
         <div className="flex items-center gap-4">
-          <Button className="gap-2">
+          <Button className="gap-2" onClick={handleSave} disabled={createProduct.isPending}>
             <Save className="w-4 h-4" />
-            Save Product
+            {createProduct.isPending ? 'Saving...' : 'Save Product'}
           </Button>
           <Button variant="outline" className="gap-2">
             <Upload className="w-4 h-4" />
@@ -68,20 +87,20 @@ export const ProductCreator = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="data1">Product ID (Data1)</Label>
+                  <Label htmlFor="product_id">Product ID</Label>
                   <Input
-                    id="data1"
-                    value={productData.data1}
-                    onChange={(e) => updateField('data1', e.target.value)}
+                    id="product_id"
+                    value={productData.product_id}
+                    onChange={(e) => updateField('product_id', e.target.value)}
                     className="macon-input"
                   />
                 </div>
                 <div>
-                  <Label htmlFor="data2">Name (Data2)</Label>
+                  <Label htmlFor="name">Name</Label>
                   <Input
-                    id="data2"
-                    value={productData.data2}
-                    onChange={(e) => updateField('data2', e.target.value)}
+                    id="name"
+                    value={productData.name}
+                    onChange={(e) => updateField('name', e.target.value)}
                     className="macon-input"
                   />
                 </div>
@@ -90,7 +109,7 @@ export const ProductCreator = () => {
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <Label htmlFor="profile">Profile</Label>
-                  <Select value={selectedProfile} onValueChange={setSelectedProfile}>
+                  <Select value={selectedProfile} onValueChange={(value: ProductProfile) => setSelectedProfile(value)}>
                     <SelectTrigger className="macon-input">
                       <SelectValue />
                     </SelectTrigger>
@@ -102,12 +121,12 @@ export const ProductCreator = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="length">Length (mm)</Label>
+                  <Label htmlFor="length_mm">Length (mm)</Label>
                   <Input
-                    id="length"
+                    id="length_mm"
                     type="number"
-                    value={productData.length}
-                    onChange={(e) => updateField('length', e.target.value)}
+                    value={productData.length_mm}
+                    onChange={(e) => updateField('length_mm', e.target.value)}
                     className="macon-input"
                   />
                 </div>
@@ -123,8 +142,8 @@ export const ProductCreator = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <Label htmlFor="data8">Status (Data8)</Label>
-                  <Select value={productData.data8} onValueChange={(value) => updateField('data8', value)}>
+                  <Label htmlFor="status">Status</Label>
+                  <Select value={productData.status} onValueChange={(value: ProductStatus) => updateField('status', value)}>
                     <SelectTrigger className="macon-input">
                       <SelectValue />
                     </SelectTrigger>
@@ -137,12 +156,12 @@ export const ProductCreator = () => {
                   </Select>
                 </div>
                 <div>
-                  <Label htmlFor="data9">Priority (Data9)</Label>
+                  <Label htmlFor="priority">Priority</Label>
                   <Input
-                    id="data9"
+                    id="priority"
                     type="number"
-                    value={productData.data9}
-                    onChange={(e) => updateField('data9', e.target.value)}
+                    value={productData.priority}
+                    onChange={(e) => updateField('priority', e.target.value)}
                     className="macon-input"
                   />
                 </div>
@@ -216,10 +235,10 @@ export const ProductCreator = () => {
             <CardContent>
               <ProductPreview
                 profile={selectedProfile}
-                length={productData.length}
+                length={productData.length_mm}
                 operations={[
                   { type: 'Hole ⌀16mm', position: 500, size: 16 },
-                  { type: 'Cut 45° angle', position: parseInt(productData.length) - 100, angle: 45 }
+                  { type: 'Cut 45° angle', position: parseInt(productData.length_mm) - 100, angle: 45 }
                 ]}
               />
             </CardContent>
@@ -233,7 +252,7 @@ export const ProductCreator = () => {
             <CardContent className="space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Total Length:</span>
-                <span className="font-medium">{productData.length}mm</span>
+                <span className="font-medium">{productData.length_mm}mm</span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-muted-foreground">Est. Cut Time:</span>

@@ -5,74 +5,51 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
+import { useBatches, useCreateBatch, useUpdateBatch, type BatchStatus, type PriorityLevel } from '@/hooks/useBatches';
 
 export const BatchEditor = () => {
   const [searchTerm, setSearchTerm] = useState('');
+  const { data: batches = [], isLoading, error } = useBatches();
+  const createBatch = useCreateBatch();
+  const updateBatch = useUpdateBatch();
 
-  const batches = [
-    { 
-      id: 'B001', 
-      name: 'Morning Production', 
-      products: '15x IPE240, 8x IPE300',
-      status: 'Running',
-      progress: 65,
-      priority: 'High',
-      created: '2024-01-15',
-      operator: 'John Smith',
-      startTime: '06:00',
-      estimatedCompletion: '14:30',
-      totalParts: 23,
-      completedParts: 15,
-      efficiency: 94.2,
-      qualityScore: 98.5
-    },
-    { 
-      id: 'B002', 
-      name: 'Afternoon Batch', 
-      products: '20x HEB200, 12x IPE240',
-      status: 'Queued',
-      progress: 0,
-      priority: 'Medium',
-      created: '2024-01-15',
-      operator: 'Maria Garcia',
-      startTime: '14:30',
-      estimatedCompletion: '22:00',
-      totalParts: 32,
-      completedParts: 0,
-      efficiency: 0,
-      qualityScore: 0
-    },
-    { 
-      id: 'B003', 
-      name: 'Special Order', 
-      products: '5x Custom Profile',
-      status: 'Completed',
-      progress: 100,
-      priority: 'High',
-      created: '2024-01-14',
-      operator: 'Mike Johnson',
-      startTime: '08:00',
-      estimatedCompletion: '12:00',
-      totalParts: 5,
-      completedParts: 5,
-      efficiency: 97.8,
-      qualityScore: 99.2
-    }
-  ];
+  if (isLoading) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p className="text-muted-foreground">Loading batches...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const getStatusColor = (status: string) => {
+  if (error) {
+    return (
+      <div className="h-full flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="h-8 w-8 text-destructive mx-auto mb-4" />
+          <p className="text-destructive">Failed to load batches</p>
+        </div>
+      </div>
+    );
+  }
+
+  const getStatusColor = (status: BatchStatus) => {
     switch (status) {
-      case 'Running': return 'bg-green-100 text-green-800 border-green-200';
-      case 'Queued': return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'Completed': return 'bg-gray-100 text-gray-800 border-gray-200';
-      case 'Scheduled': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      default: return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'Running': return 'macon-status-running';
+      case 'Queued': return 'macon-status-waiting';
+      case 'Completed': return 'macon-status-complete';
+      case 'Error': return 'macon-status-error';
+      case 'Paused': return 'macon-status-waiting';
+      default: return 'macon-status-waiting';
     }
   };
 
-  const getPriorityColor = (priority: string) => {
+  const getPriorityColor = (priority: PriorityLevel) => {
     switch (priority) {
-      case 'High': return 'bg-red-100 text-red-800 border-red-200';
+      case 'High': 
+      case 'Critical': return 'bg-red-100 text-red-800 border-red-200';
       case 'Medium': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
       case 'Low': return 'bg-green-100 text-green-800 border-green-200';
       default: return 'bg-gray-100 text-gray-800 border-gray-200';
@@ -81,8 +58,8 @@ export const BatchEditor = () => {
 
   const filteredBatches = batches.filter(batch =>
     batch.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    batch.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    batch.operator.toLowerCase().includes(searchTerm.toLowerCase())
+    batch.batch_id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    batch.operator_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
@@ -163,7 +140,7 @@ export const BatchEditor = () => {
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Avg Efficiency</p>
                   <p className="text-2xl font-bold">
-                    {(batches.reduce((sum, b) => sum + b.efficiency, 0) / batches.length).toFixed(1)}%
+                    {batches.length > 0 ? (batches.reduce((sum, b) => sum + b.efficiency_percentage, 0) / batches.length).toFixed(1) : '0'}%
                   </p>
                 </div>
                 <TrendingUp className="w-8 h-8 text-orange-500" />
@@ -185,13 +162,13 @@ export const BatchEditor = () => {
                         <BarChart3 className="w-5 h-5 text-primary" />
                       </div>
                       <div>
-                        <h3 className="font-mono font-bold text-lg">{batch.id}</h3>
+                        <h3 className="font-mono font-bold text-lg">{batch.batch_id}</h3>
                         <p className="text-sm text-muted-foreground">{batch.name}</p>
                       </div>
                     </div>
                     
                     <div className="flex flex-wrap gap-2">
-                      <Badge className={getStatusColor(batch.status)}>
+                      <Badge className={`macon-status-badge ${getStatusColor(batch.status)}`}>
                         {batch.status}
                       </Badge>
                       <Badge className={getPriorityColor(batch.priority)}>
@@ -202,11 +179,11 @@ export const BatchEditor = () => {
                     <div className="text-sm space-y-1">
                       <div className="flex items-center gap-2">
                         <User className="w-4 h-4 text-muted-foreground" />
-                        <span>{batch.operator}</span>
+                        <span>{batch.operator_name}</span>
                       </div>
                       <div className="flex items-center gap-2">
                         <Calendar className="w-4 h-4 text-muted-foreground" />
-                        <span>{batch.created}</span>
+                        <span>{new Date(batch.created_at).toLocaleDateString()}</span>
                       </div>
                     </div>
                   </div>
@@ -216,18 +193,18 @@ export const BatchEditor = () => {
                     <div>
                       <div className="flex justify-between items-center mb-2">
                         <span className="text-sm font-medium">Progress</span>
-                        <span className="text-sm font-bold">{batch.progress}%</span>
+                        <span className="text-sm font-bold">{batch.progress_percentage}%</span>
                       </div>
-                      <Progress value={batch.progress} className="h-3" />
+                      <Progress value={batch.progress_percentage} className="h-3" />
                       <div className="flex justify-between items-center mt-1 text-xs text-muted-foreground">
-                        <span>{batch.completedParts}/{batch.totalParts} parts</span>
-                        <span>ETA: {batch.estimatedCompletion}</span>
+                        <span>{batch.completed_parts}/{batch.total_parts} parts</span>
+                        <span>ETA: {batch.estimated_completion_time || 'N/A'}</span>
                       </div>
                     </div>
 
                     <div className="text-sm text-muted-foreground">
                       <p className="font-medium text-foreground mb-1">Products:</p>
-                      <p>{batch.products}</p>
+                      <p>Batch #{batch.batch_id} - {batch.total_parts} total parts</p>
                     </div>
 
                     <div className="grid grid-cols-3 gap-4">
@@ -236,21 +213,21 @@ export const BatchEditor = () => {
                           <Clock className="w-4 h-4 text-muted-foreground" />
                           <span className="text-xs font-medium text-muted-foreground">Start</span>
                         </div>
-                        <p className="font-bold">{batch.startTime}</p>
+                        <p className="font-bold">{batch.start_time || 'N/A'}</p>
                       </div>
                       <div className="text-center p-3 bg-muted/30 rounded-lg">
                         <div className="flex items-center justify-center gap-1 mb-1">
                           <TrendingUp className="w-4 h-4 text-muted-foreground" />
                           <span className="text-xs font-medium text-muted-foreground">Efficiency</span>
                         </div>
-                        <p className="font-bold">{batch.efficiency}%</p>
+                        <p className="font-bold">{batch.efficiency_percentage}%</p>
                       </div>
                       <div className="text-center p-3 bg-muted/30 rounded-lg">
                         <div className="flex items-center justify-center gap-1 mb-1">
                           <AlertCircle className="w-4 h-4 text-muted-foreground" />
                           <span className="text-xs font-medium text-muted-foreground">Quality</span>
                         </div>
-                        <p className="font-bold">{batch.qualityScore}%</p>
+                        <p className="font-bold">{batch.quality_score_percentage}%</p>
                       </div>
                     </div>
                   </div>
