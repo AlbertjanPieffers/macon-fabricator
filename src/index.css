@@ -136,7 +136,8 @@ All colors MUST be HSL.
   }
 
   .macon-grid-row.selected {
-    @apply bg-primary/8 border-l-4 border-l-primary;
+    @apply border-l-4 border-l-primary;
+    background-color: hsl(var(--primary) / 0.08);
   }
 
   .macon-tab {
