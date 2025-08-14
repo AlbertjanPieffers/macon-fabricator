@@ -15,15 +15,29 @@ export const Dashboard = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mock data for now - will be replaced with API call
-    setTimeout(() => {
-      setMachineStatus({
-        state: 'Running',
-        progressPct: 73,
-        currentProduct: 'IPE200-Part-A'
-      });
-      setLoading(false);
-    }, 1000);
+    const fetchMachineStatus = async () => {
+      try {
+        const { apiClient } = await import('@/lib/api');
+        const status = await apiClient.getMachineStatus();
+        setMachineStatus({
+          state: status.state,
+          progressPct: status.progressPct,
+          currentProduct: status.currentProduct
+        });
+      } catch (error) {
+        console.error('Failed to fetch machine status:', error);
+        // Fallback to mock data
+        setMachineStatus({
+          state: 'Unknown',
+          progressPct: 0,
+          currentProduct: 'None'
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMachineStatus();
   }, []);
 
   const getStatusColor = (state: string) => {

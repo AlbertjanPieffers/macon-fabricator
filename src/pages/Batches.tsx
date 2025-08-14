@@ -45,7 +45,7 @@ export const Batches = () => {
 
   useEffect(() => {
     checkUserRole();
-    loadMockData();
+    loadData();
   }, [user]);
 
   const checkUserRole = async () => {
@@ -64,23 +64,31 @@ export const Batches = () => {
     }
   };
 
-  const loadMockData = () => {
-    // Mock data - will be replaced with API calls
-    setTimeout(() => {
-      setProducts([
-        { _id: '1', Name: 'IPE200-Beam-A', Profile: 'IPE200', Length: 3000 },
-        { _id: '2', Name: 'HEA300-Column', Profile: 'HEA300', Length: 4500 },
-        { _id: '3', Name: 'UPN120-Support', Profile: 'UPN120', Length: 1200 },
-        { _id: '4', Name: 'L90x90-Angle', Profile: 'L90x90', Length: 2000 },
-      ]);
+  const loadData = async () => {
+    try {
+      const { apiClient } = await import('@/lib/api');
       
-      setBatches([
-        { _id: '1', Data2: 'Morning Batch', Data3: '1x2,2x1', Data8: 'Waiting', Data9: 'High' },
-        { _id: '2', Data2: 'Afternoon Batch', Data3: '3x3,4x1', Data8: 'Running', Data9: 'Medium' },
-      ]);
+      // Fetch products
+      const productsData = await apiClient.getProducts();
+      const transformedProducts = productsData.map((product: any) => ({
+        _id: product._id || product.index?.toString(),
+        Name: product.Name || product.FileName || 'Unnamed',
+        Profile: product.Profile || product.Data8 || 'Unknown',
+        Length: product.Length || (product.Data4 ? parseInt(product.Data4) : 0)
+      }));
+      setProducts(transformedProducts);
       
+      // Fetch batches
+      const batchesData = await apiClient.getBatches();
+      setBatches(batchesData);
+      
+    } catch (error) {
+      console.error('Failed to fetch data:', error);
+      setProducts([]);
+      setBatches([]);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
   };
 
   const addToBatch = (product: Product) => {
@@ -107,7 +115,7 @@ export const Batches = () => {
     }).filter(item => item.count > 0));
   };
 
-  const saveBatch = () => {
+  const saveBatch = async () => {
     if (!batchName || batchItems.length === 0) {
       toast({
         title: "Validation Error",
@@ -117,27 +125,39 @@ export const Batches = () => {
       return;
     }
 
-    // Create Data3 string: "productId1xcount1,productId2xcount2,..."
-    const data3 = batchItems.map(item => `${item.productId}x${item.count}`).join(',');
+    try {
+      const { apiClient } = await import('@/lib/api');
+      
+      // Create Data3 string: "productId1xcount1,productId2xcount2,..."
+      const data3 = batchItems.map(item => `${item.productId}x${item.count}`).join(',');
+      
+      const batch = {
+        Data2: batchName,
+        Data3: data3,
+        Data8: 'Waiting',
+        Data9: 'Medium',
+        FullPath: 'NA'
+      };
 
-    // Mock save - will be replaced with API call
-    const newBatch: Batch = {
-      Data2: batchName,
-      Data3: data3,
-      Data8: 'Waiting',
-      Data9: 'Medium'
-    };
+      await apiClient.createBatch(batch);
+      
+      toast({
+        title: "Batch Saved",
+        description: `Batch "${batchName}" has been created successfully`,
+      });
 
-    console.log('Saving batch:', newBatch);
-    
-    toast({
-      title: "Batch Saved",
-      description: `Batch "${batchName}" has been created successfully`,
-    });
-
-    // Reset form
-    setBatchName('');
-    setBatchItems([]);
+      // Reset form and reload data
+      setBatchName('');
+      setBatchItems([]);
+      loadData();
+    } catch (error) {
+      console.error('Failed to save batch:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save batch. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const getStatusColor = (status?: string) => {

@@ -24,48 +24,40 @@ export const Progress = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Mock data for now - will be replaced with API calls
-    setTimeout(() => {
-      setMachineStatus({
-        state: 'Running',
-        progressPct: 73,
-        currentProduct: 'IPE200-Part-A',
-        timestamp: new Date().toISOString()
-      });
+    const fetchData = async () => {
+      try {
+        const { apiClient } = await import('@/lib/api');
+        
+        // Fetch machine status
+        const status = await apiClient.getMachineStatus();
+        setMachineStatus({
+          state: status.state,
+          progressPct: status.progressPct,
+          currentProduct: status.currentProduct,
+          timestamp: new Date().toISOString()
+        });
 
-      setEvents([
-        {
-          id: '1',
-          timestamp: new Date(Date.now() - 300000).toISOString(),
-          level: 'info',
-          message: 'Batch "Morning Production" started',
-          source: 'PLC'
-        },
-        {
-          id: '2',
-          timestamp: new Date(Date.now() - 600000).toISOString(),
-          level: 'info',
-          message: 'Product IPE200-Part-A loaded',
-          source: 'Machine'
-        },
-        {
-          id: '3',
-          timestamp: new Date(Date.now() - 900000).toISOString(),
-          level: 'warning',
-          message: 'Laser power adjusted to 85%',
-          source: 'PLC'
-        },
-        {
-          id: '4',
-          timestamp: new Date(Date.now() - 1200000).toISOString(),
-          level: 'info',
-          message: 'System calibration completed',
-          source: 'System'
-        }
-      ]);
+        // Fetch machine events
+        const events = await apiClient.getMachineEvents();
+        setEvents(events);
 
-      setLoading(false);
-    }, 1000);
+      } catch (error) {
+        console.error('Failed to fetch machine data:', error);
+        
+        // Fallback to mock data
+        setMachineStatus({
+          state: 'Unknown',
+          progressPct: 0,
+          currentProduct: 'None',
+          timestamp: new Date().toISOString()
+        });
+        setEvents([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const formatTimestamp = (timestamp: string) => {

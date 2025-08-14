@@ -23,17 +23,30 @@ export const Products = () => {
   const [profileFilter, setProfileFilter] = useState('');
 
   useEffect(() => {
-    // Mock data for now - will be replaced with API call
-    setTimeout(() => {
-      setProducts([
-        { _id: '1', Name: 'IPE200-Beam-A', Profile: 'IPE200', Length: 3000, FileName: 'IPE200_A.nc' },
-        { _id: '2', Name: 'HEA300-Column', Profile: 'HEA300', Length: 4500, FileName: 'HEA300_col.nc' },
-        { _id: '3', Name: 'UPN120-Support', Profile: 'UPN120', Length: 1200, FileName: 'UPN120_sup.nc' },
-        { _id: '4', Name: 'L90x90-Angle', Profile: 'L90x90', Length: 2000, FileName: 'L90_angle.nc' },
-        { _id: '5', Name: 'IPE160-Beam-B', Profile: 'IPE160', Length: 2500, FileName: 'IPE160_B.nc' },
-      ]);
-      setLoading(false);
-    }, 1000);
+    const fetchProducts = async () => {
+      try {
+        const { apiClient } = await import('@/lib/api');
+        const products = await apiClient.getProducts();
+        
+        // Transform MongoDB products to frontend format
+        const transformedProducts = products.map((product: any) => ({
+          _id: product._id || product.index?.toString(),
+          Name: product.Name || product.FileName || 'Unnamed',
+          Profile: product.Profile || product.Data8 || 'Unknown',
+          Length: product.Length || (product.Data4 ? parseInt(product.Data4) : 0),
+          FileName: product.FileName || 'N/A'
+        }));
+        
+        setProducts(transformedProducts);
+      } catch (error) {
+        console.error('Failed to fetch products:', error);
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
   }, []);
 
   const filteredProducts = products.filter(product => {
