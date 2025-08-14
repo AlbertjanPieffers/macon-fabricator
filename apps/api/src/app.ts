@@ -19,8 +19,15 @@ app.use(helmet());
 
 // CORS configuration
 const corsOptions = {
-  origin: process.env.ALLOWED_ORIGIN || 'http://localhost:5173',
-  credentials: true,
+  origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+    const allowedOrigins = (process.env.ALLOWED_ORIGIN || 'http://localhost:5173').split(',');
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: false,
   optionsSuccessStatus: 200
 };
 app.use(cors(corsOptions));
@@ -55,6 +62,7 @@ declare global {
 // Health check endpoint
 app.get('/health', (req, res) => {
   res.status(200).json({ 
+    ok: true,
     status: 'OK', 
     timestamp: new Date().toISOString(),
     version: '1.0.0'

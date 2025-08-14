@@ -26,8 +26,23 @@ class ApiClient {
     const response = await fetch(`${API_BASE}${endpoint}`, config);
     
     if (!response.ok) {
-      const error = await response.json().catch(() => ({ error: 'Unknown error' }));
-      throw new Error(error.error || `HTTP ${response.status}`);
+      let errorMessage = `HTTP ${response.status}`;
+      try {
+        const error = await response.json();
+        errorMessage = error.error || errorMessage;
+      } catch {
+        // Fallback if response is not JSON
+      }
+      
+      if (response.status === 401) {
+        throw new Error('Niet ingelogd - log opnieuw in');
+      } else if (response.status === 403) {
+        throw new Error('Geen rechten voor deze actie');
+      } else if (response.status === 502 && errorMessage.includes('bridge_down')) {
+        throw new Error('PLC/File bridge offline');
+      }
+      
+      throw new Error(errorMessage);
     }
 
     return response.json();

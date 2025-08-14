@@ -1,58 +1,60 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
-import { Navigation } from '@/components/Navigation';
-import { Dashboard } from '@/pages/Dashboard';
-import { Products } from '@/pages/Products';
-import { Batches } from '@/pages/Batches';
-import { Progress } from '@/pages/Progress';
-import { Settings } from '@/pages/Settings';
-import { Login } from '@/pages/Login';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Activity, Loader2 } from 'lucide-react';
 
 const Index = () => {
-  const [currentPage, setCurrentPage] = useState('dashboard');
   const { user, loading } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!loading) {
+      if (user) {
+        navigate('/dashboard');
+      } else {
+        navigate('/login');
+      }
+    }
+  }, [user, loading, navigate]);
 
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center mx-auto">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-foreground"></div>
-          </div>
-          <p className="text-muted-foreground">Loading MACON Office...</p>
-        </div>
+        <Card className="bg-card border-border rounded-2xl shadow-lg">
+          <CardContent className="flex items-center justify-center p-8">
+            <div className="flex items-center gap-3">
+              <Loader2 className="h-6 w-6 animate-spin text-primary" />
+              <span className="text-card-foreground">Loading MACON Office...</span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
     );
   }
 
-  if (!user) {
-    return <Login />;
-  }
-
-  const renderCurrentPage = () => {
-    switch (currentPage) {
-      case 'dashboard':
-        return <Dashboard />;
-      case 'products':
-        return <Products />;
-      case 'batches':
-        return <Batches />;
-      case 'progress':
-        return <Progress />;
-      case 'settings':
-        return <Settings />;
-      default:
-        return <Dashboard />;
-    }
-  };
-
   return (
-    <div className="min-h-screen bg-background">
-      <Navigation currentPage={currentPage} onNavigate={setCurrentPage} />
-      <main className="flex-1">
-        {renderCurrentPage()}
-      </main>
+    <div className="min-h-screen bg-background flex items-center justify-center p-6">
+      <Card className="bg-card border-border rounded-2xl shadow-lg max-w-md w-full">
+        <CardHeader className="text-center">
+          <CardTitle className="flex items-center justify-center gap-2 text-card-foreground">
+            <Activity className="h-6 w-6 text-primary" />
+            MACON Office
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="text-center space-y-4">
+          <p className="text-muted-foreground">
+            Production management interface
+          </p>
+          <Button 
+            onClick={() => navigate('/login')} 
+            className="w-full"
+          >
+            Continue to Login
+          </Button>
+        </CardContent>
+      </Card>
     </div>
   );
 };

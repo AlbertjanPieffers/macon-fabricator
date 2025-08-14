@@ -1,73 +1,147 @@
-# Welcome to your Lovable project
+# MACON Office Interface
 
-## Project info
+A web-based interface for managing MACON production operations with authentication, batch management, and real-time machine monitoring.
 
-**URL**: https://lovable.dev/projects/1e4420ca-b0d8-4b11-98a8-4c7133377843
+## Architecture
 
-## How can I edit this code?
+- **Frontend**: React + TypeScript + Tailwind CSS (SPA)
+- **Backend**: Node.js + Express API 
+- **Authentication**: Supabase Auth with JWT + RBAC
+- **Database**: MongoDB (Products, Batches)
+- **Machine Integration**: PLC HTTP Bridge (read-only)
+- **File Management**: File Bridge (read-only proxy)
 
-There are several ways of editing your application.
+## Environment Variables
 
-**Use Lovable**
-
-Simply visit the [Lovable Project](https://lovable.dev/projects/1e4420ca-b0d8-4b11-98a8-4c7133377843) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+### Frontend (VITE_*)
+```
+VITE_API_BASE=https://<public-office-api-url>
+VITE_SUPABASE_URL=https://<your>.supabase.co
+VITE_SUPABASE_ANON_KEY=<anon-key>
 ```
 
-**Edit a file directly in GitHub**
+### Backend (API)
+```
+PORT=8080
+MONGO_URI=mongodb://<user>:<pass>@<mongo-host>:27017
+MONGO_DB=MACON_Production
+PLC_BRIDGE_BASE=http://<ZT-or-LAN-IP>:5001
+FILE_BRIDGE_BASE=http://<ZT-or-LAN-IP>:5100
+ALLOWED_ORIGIN=https://<frontend-host>
+SUPABASE_JWKS=https://<your>.supabase.co/auth/v1/keys
+REQUIRED_ROLE=office
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+**Note**: PLC/File bridges are LAN/ZeroTier only. Only the Office API is publicly accessible.
 
-**Use GitHub Codespaces**
+## API Endpoints
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### Authentication
+All endpoints require valid JWT Bearer token. Mutations require "office" role.
 
-## What technologies are used for this project?
+### Products
+- `GET /products?q=&profile=` - List products with filters
+- Returns: Products from MongoDB with regex search on Name/FileName/Profile/Data8
 
-This project is built with:
+### Batches  
+- `GET /batches` - List all batches
+- `POST /batches` - Create batch (requires office role)
+  - Body: `{ Data2: "batch name", Data3: "P123x2,P004x5", ... }`
+- `PUT /batches/:index` - Update/upsert batch by index (requires office role)
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+### Machine (Read-only via PLC Bridge)
+- `GET /machine/status` - Combined status from PLC symbols:
+  - `MAIN.MachineState`, `MAIN.ProgressPct`, `MAIN.CurrentProduct`
+  - Returns: `{ state, progressPct, currentProduct }`
+- `GET /machine/events` - Machine events (placeholder, returns [])
 
-## How can I deploy this project?
+### Files (Read-only via File Bridge)
+- `GET /files/list?sub=Products` - List files/directories
+- `GET /files/download?path=Products/<file.nc>` - Download file stream
 
-Simply open [Lovable](https://lovable.dev/projects/1e4420ca-b0d8-4b11-98a8-4c7133377843) and click on Share -> Publish.
+### Health
+- `GET /health` - Health check (returns 200 OK)
 
-## Can I connect a custom domain to my Lovable project?
+## Security
 
-Yes, you can!
+- **CORS**: Locked to specific frontend origin
+- **Authentication**: Supabase JWT validation via JWKS
+- **RBAC**: Only "office" role can create/modify batches
+- **Network**: No direct browser access to PLC/MongoDB/Files
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## Error Handling
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+- `401` - Not authenticated
+- `403` - Insufficient permissions (no office role)
+- `502` - Bridge offline (PLC/File bridge unreachable)
+- `400` - Validation errors
+- `500` - Server errors
+
+## Testing
+
+### Manual Test Plan
+
+1. **Health Check**
+   ```bash
+   GET /health → 200 { ok: true }
+   ```
+
+2. **Authentication**
+   ```bash
+   # Without token
+   GET /batches → 401
+   
+   # With token (user role)
+   GET /batches → 200
+   POST /batches → 403
+   
+   # With token (office role)  
+   POST /batches → 200
+   ```
+
+3. **Data Operations**
+   ```bash
+   # Products with filters
+   GET /products?q=beam&profile=IPE → filtered results
+   
+   # Batch creation
+   POST /batches { Data2: "Test Batch", Data3: "P123x2" } → 200, appears in MongoDB
+   
+   # Machine status
+   GET /machine/status → { state, progressPct, currentProduct }
+   # If PLC bridge down → 502 bridge_down
+   
+   # File operations
+   GET /files/list?sub=Products → file entries
+   GET /files/download?path=Products/example.nc → file stream
+   ```
+
+4. **Frontend Flow**
+   - Visit app → shows splash screen
+   - Not logged in → redirects to login
+   - Login with email/password → redirects to dashboard
+   - Dashboard shows machine status from API
+   - Products page shows filtered product list  
+   - Batches page allows creation (if office role)
+   - Progress page shows JSON dumps
+
+## Development
+
+```bash
+# Frontend
+npm run dev
+
+# Backend  
+npm run dev
+
+# Build
+npm run build
+```
+
+## Production Notes
+
+- Set all environment variables in Lovable secrets
+- Configure Supabase Site URL and Redirect URLs
+- Ensure PLC/File bridges are accessible from API server via LAN/ZeroTier
+- Firewall: Block direct public access to PLC/File bridges
+- Office API should be the only public endpoint

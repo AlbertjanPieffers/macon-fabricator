@@ -12,7 +12,7 @@ declare global {
 }
 
 const client = jwksClient({
-  jwksUri: process.env.SUPABASE_JWKS || '',
+  jwksUri: process.env.SUPABASE_JWKS || 'https://nerhxpfcccyggmmxdugc.supabase.co/auth/v1/keys',
   cache: true,
   cacheMaxAge: 600000, // 10 minutes
 });
@@ -41,7 +41,7 @@ export const authenticateToken = (requireRole = false) => {
       const decoded = await new Promise<any>((resolve, reject) => {
         jwt.verify(token, getKey, {
           audience: 'authenticated',
-          issuer: process.env.SUPABASE_JWKS?.replace('/auth/v1/keys', '/auth/v1'),
+          issuer: 'https://nerhxpfcccyggmmxdugc.supabase.co/auth/v1',
           algorithms: ['RS256']
         }, (err, decoded) => {
           if (err) reject(err);
@@ -52,8 +52,15 @@ export const authenticateToken = (requireRole = false) => {
       const user: AuthUser = {
         sub: decoded.sub,
         email: decoded.email,
-        roles: decoded.user_metadata?.roles || []
+        roles: [] // Will be fetched from Supabase user_roles table
       };
+
+      // TODO: Fetch user roles from Supabase user_roles table
+      // For now, check user_metadata for office role
+      const userMetadata = decoded.user_metadata || {};
+      if (userMetadata.roles && Array.isArray(userMetadata.roles)) {
+        user.roles = userMetadata.roles;
+      }
 
       req.user = user;
 

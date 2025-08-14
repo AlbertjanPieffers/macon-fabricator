@@ -18,7 +18,22 @@
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <style>
+        .splash-wrap{display:grid;place-items:center;min-height:100vh;color:#fff;background:#082231}
+        .splash{padding:24px 28px;border-radius:16px;background:#0c3550;border:1px solid rgba(255,255,255,.12);box-shadow:0 10px 30px rgba(0,0,0,.25);text-align:center}
+        .spinner{width:28px;height:28px;border:3px solid rgba(255,255,255,.3);border-top-color:#fff;border-radius:50%;animation:spin 1s linear infinite;margin:0 auto 12px}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        .muted{opacity:.7;font-size:12px}
+      </style>
+      <div class="splash-wrap">
+        <div class="splash">
+          <div class="spinner"></div>
+          <div>Loading MACON Office…</div>
+          <div class="muted">Als dit blijft hangen: check console/network.</div>
+        </div>
+      </div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
