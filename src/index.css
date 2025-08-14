@@ -8,13 +8,18 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* MACON Industrial Design System */
+    /* MACON Product Editor Design System */
     --macon-blue: 202 100% 33%;           /* #0077aa */
     --macon-blue-dark: 202 100% 28%;      /* #005f8e */
-    --macon-gray: 213 14% 82%;            /* #d0d3d6 */
+    --macon-blue-light: 202 100% 33% / 0.08; /* rgba(0,119,170,.08) */
     --macon-bg: 213 43% 96%;              /* #f3f5f8 */
+    --macon-surface: 0 0% 100%;           /* #ffffff */
     --macon-border: 0 0% 69%;             /* #b0b0b0 */
+    --macon-divider: 210 22% 89%;         /* #e4e6ea */
     --macon-text: 0 0% 13%;               /* #222 */
+    --macon-text-dim: 0 0% 33%;           /* #555 */
+    
+    /* Status colors */
     --macon-success: 120 61% 50%;         /* #4CAF50 */
     --macon-warning: 43 96% 56%;          /* #FF9800 */
     --macon-error: 4 90% 58%;             /* #F44336 */
@@ -22,40 +27,48 @@ All colors MUST be HSL.
     /* Semantic tokens mapped to MACON */
     --background: 213 43% 96%;            /* macon-bg */
     --foreground: 0 0% 13%;               /* macon-text */
-    
-    --card: 0 0% 100%;                    /* white cards */
+
+    --card: 0 0% 100%;                    /* macon-surface */
     --card-foreground: 0 0% 13%;          /* macon-text */
-    
+
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 13%;
-    
+
     --primary: 202 100% 33%;              /* macon-blue */
     --primary-foreground: 0 0% 100%;      /* white */
-    
+
     --secondary: 213 14% 82%;             /* macon-gray */
     --secondary-foreground: 0 0% 13%;     /* macon-text */
-    
+
     --muted: 213 14% 82%;                 /* macon-gray */
-    --muted-foreground: 0 0% 45%;         /* softer text */
-    
+    --muted-foreground: 0 0% 33%;         /* macon-text-dim */
+
     --accent: 202 100% 33%;               /* macon-blue */
     --accent-foreground: 0 0% 100%;       /* white */
-    
+
     --destructive: 4 90% 58%;             /* macon-error */
     --destructive-foreground: 0 0% 100%;  /* white */
-    
+
     --border: 0 0% 69%;                   /* macon-border */
     --input: 0 0% 69%;                    /* macon-border */
     --ring: 202 100% 33%;                 /* macon-blue */
-    
+
     --radius: 0.75rem;                    /* 12px default radius */
-    
-    /* Status colors */
-    --status-waiting: 0 0% 69%;           /* gray */
-    --status-running: 202 100% 33%;       /* blue */
-    --status-complete: 120 61% 50%;       /* green */
-    --status-error: 4 90% 58%;            /* red */
-    
+    --radius-sm: 0.5rem;                  /* 8px */
+    --radius-lg: 1rem;                    /* 16px */
+
+    /* Spacing system */
+    --spacing-1: 0.375rem;                /* 6px */
+    --spacing-2: 0.625rem;                /* 10px */
+    --spacing-3: 0.875rem;                /* 14px */
+    --spacing-4: 1rem;                    /* 16px */
+    --spacing-5: 1.25rem;                 /* 20px */
+    --spacing-6: 1.5rem;                  /* 24px */
+
+    /* Shadows */
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.10);
+
     /* Sidebar tokens */
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 13%;
@@ -117,58 +130,240 @@ All colors MUST be HSL.
     line-height: 1.4;
   }
 
-  /* MACON Industrial Components */
-  .macon-card {
-    @apply bg-card border border-border rounded-xl shadow-sm p-4;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  }
-
-  .macon-input {
-    @apply w-full px-3 py-2 border border-input rounded-lg outline-none transition-all;
-  }
-
-  .macon-input:focus {
-    @apply border-primary ring-4 ring-primary/15;
-  }
-
-  .macon-grid-row {
-    @apply border-b border-border hover:bg-muted/30 transition-colors;
-  }
-
-  .macon-grid-row.selected {
-    @apply border-l-4 border-l-primary;
-    background-color: hsl(var(--primary) / 0.08);
-  }
-
-  .macon-tab {
-    @apply px-4 py-2 border-b-2 border-transparent cursor-pointer transition-colors hover:text-primary;
-  }
-
-  .macon-tab.active {
-    @apply border-b-primary font-semibold text-primary;
-  }
-
-  .macon-status-badge {
-    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium;
-  }
-
-  .macon-status-waiting {
-    @apply bg-gray-100 text-gray-800;
-  }
-
-  .macon-status-running {
-    @apply bg-blue-100 text-blue-800;
-  }
-
-  .macon-status-complete {
-    @apply bg-green-100 text-green-800;
-  }
-
-  .macon-status-error {
-    @apply bg-red-100 text-red-800;
+  /* MACON Product Editor Components */
+  
+  /* App Shell */
+  .macon-app {
+    max-width: 1280px;
+    margin: 0 auto;
+    display: grid;
+    gap: var(--spacing-6);
   }
 
   .macon-toolbar {
-    @apply sticky top-0 z-10 bg-background border-b border-border px-6 py-4 flex items-center gap-4;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-3);
+    background: hsl(var(--background));
+    padding: var(--spacing-4) 0;
+    border-bottom: 1px solid hsl(var(--macon-divider));
+  }
+
+  /* Cards */
+  .macon-card {
+    background: hsl(var(--card));
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+    padding: var(--spacing-5);
+  }
+
+  .macon-split {
+    display: grid;
+    gap: var(--spacing-6);
+    grid-template-columns: 420px 1fr;
+  }
+
+  /* Buttons */
+  .macon-btn {
+    @apply inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium cursor-pointer select-none transition-all;
+    border: 1px solid hsl(var(--primary));
+    background: transparent;
+    color: hsl(var(--primary));
+  }
+
+  .macon-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+  }
+
+  .macon-btn-primary {
+    background: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  .macon-btn-primary:hover {
+    background: hsl(var(--macon-blue-dark));
+  }
+
+  .macon-btn-outline:hover {
+    background: hsl(var(--macon-blue-light));
+  }
+
+  .macon-btn-ghost {
+    border-color: transparent;
+    color: hsl(var(--muted-foreground));
+  }
+
+  .macon-btn-ghost:hover {
+    background: hsl(var(--card));
+    border-color: hsl(var(--macon-divider));
+  }
+
+  /* Forms */
+  .macon-form {
+    display: grid;
+    gap: var(--spacing-4);
+  }
+
+  .macon-field {
+    display: grid;
+    gap: 6px;
+  }
+
+  .macon-label {
+    @apply text-xs text-muted-foreground;
+  }
+
+  .macon-input {
+    @apply w-full px-2.5 py-2 rounded-lg border border-input bg-card text-foreground;
+  }
+
+  .macon-input:focus {
+    @apply outline-none border-primary ring-2 ring-primary/15;
+  }
+
+  .macon-inline {
+    display: grid;
+    gap: var(--spacing-3);
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Tabs */
+  .macon-tabs {
+    display: flex;
+    gap: 18px;
+    border-bottom: 1px solid hsl(var(--macon-divider));
+    margin-bottom: var(--spacing-4);
+  }
+
+  .macon-tab {
+    padding: 10px 2px;
+    cursor: pointer;
+    color: hsl(var(--muted-foreground));
+    border-bottom: 2px solid transparent;
+    transition: border 0.15s;
+  }
+
+  .macon-tab.active {
+    color: hsl(var(--foreground));
+    border-color: hsl(var(--primary));
+    font-weight: 600;
+  }
+
+  /* Datagrid */
+  .macon-datagrid {
+    --row-height: 36px;
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    overflow: hidden;
+    background: hsl(var(--card));
+  }
+
+  .macon-datagrid-header {
+    background: hsl(213 43% 98%);
+    border-bottom: 1px solid hsl(var(--macon-divider));
+  }
+
+  .macon-datagrid-row {
+    display: grid;
+    align-items: center;
+    min-height: var(--row-height);
+    border-bottom: 1px solid hsl(var(--macon-divider));
+  }
+
+  .macon-datagrid-row:nth-child(even) {
+    background: hsl(213 43% 99%);
+  }
+
+  .macon-datagrid-row.selected {
+    background: hsl(var(--macon-blue-light));
+    position: relative;
+  }
+
+  .macon-datagrid-row.selected::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 3px;
+    background: hsl(var(--primary));
+  }
+
+  .macon-datagrid-cell {
+    padding: 6px 10px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  /* Preview Panel */
+  .macon-preview {
+    border: 1px solid hsl(var(--border));
+    border-radius: var(--radius);
+    background: hsl(var(--card));
+    box-shadow: var(--shadow-sm);
+    padding: var(--spacing-4);
+  }
+
+  .macon-canvas-wrap {
+    position: relative;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    background: hsl(var(--card));
+  }
+
+  .macon-canvas-grid {
+    background-image:
+      linear-gradient(to right, hsl(210 22% 95%) 1px, transparent 1px),
+      linear-gradient(to bottom, hsl(210 22% 95%) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+
+  /* Status Chips */
+  .macon-chip {
+    @apply inline-flex items-center px-2 py-1 text-xs rounded-full border;
+    background: hsl(var(--card));
+    color: hsl(var(--muted-foreground));
+    border-color: hsl(var(--macon-divider));
+  }
+
+  .macon-chip-success {
+    border-color: hsl(var(--macon-success));
+    color: hsl(120 61% 35%);
+    background: hsl(120 61% 96%);
+  }
+
+  .macon-chip-warning {
+    border-color: hsl(var(--macon-warning));
+    color: hsl(43 96% 35%);
+    background: hsl(43 96% 96%);
+  }
+
+  .macon-chip-error {
+    border-color: hsl(var(--macon-error));
+    color: hsl(4 90% 35%);
+    background: hsl(4 90% 96%);
+  }
+
+  /* Section Headers */
+  .macon-section {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-4);
+  }
+
+  .macon-section-title {
+    @apply text-base font-semibold;
+  }
+
+  .macon-section-actions {
+    display: flex;
+    gap: var(--spacing-3);
   }
 }
