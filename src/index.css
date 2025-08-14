@@ -8,80 +8,75 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* MACON Blue Background Theme */
-    --macon-blue-900: 202 100% 22%;          /* #004e72 */
-    --macon-blue-700: 202 100% 29%;          /* #006a96 */
-    --macon-blue: 202 100% 33%;              /* #0077aa */
-    --macon-blue-light: 202 100% 33% / 0.10; /* rgba(0,119,170,.10) */
-    --macon-white: 0 0% 100%;                /* #ffffff */
-    --macon-border: 201 23% 78%;             /* #b0c9d6 */
-    --macon-divider: 0 0% 100% / 0.25;       /* rgba(255,255,255,.25) */
-    --macon-text: 210 50% 11%;               /* #0f1b25 - dark text on white cards */
-    --macon-text-inv: 201 100% 93%;          /* #eaf6ff - light text on blue bg */
+    /* MACON Dark Modern Theme */
+    --bg: 210 65% 10%;                       /* #0e1320 */
+    --panel: 215 50% 12%;                    /* #11182a */
+    --muted: 215 25% 65%;                    /* #92a1b2 */
+    --text: 215 50% 92%;                     /* #e7ecf3 */
+    --primary: 209 100% 61%;                 /* #3aa4ff */
+    --primary-2: 162 100% 41%;               /* #00d084 */
+    --danger: 0 100% 68%;                    /* #ff5f5f */
+    --border: 220 40% 25%;                   /* #1f2a44 */
     
-    /* Status colors */
-    --macon-success: 120 61% 50%;            /* #4CAF50 */
-    --macon-warning: 43 96% 56%;             /* #FF9800 */
-    --macon-error: 4 90% 58%;                /* #F44336 */
+    /* Enhanced shadows and effects */
+    --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.15);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.20);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.30);
+    --shadow-xl: 0 24px 72px rgba(0, 0, 0, 0.40);
+    --shadow-button: 0 6px 20px rgba(58, 164, 255, 0.25);
+    --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.1);
     
-    /* Semantic tokens mapped to blue theme */
-    --background: 202 100% 29%;              /* macon-blue-700 */
-    --foreground: 201 100% 93%;              /* macon-text-inv */
+    /* Semantic tokens mapped to dark theme */
+    --background: 210 65% 8%;                /* darker bg gradient */
+    --foreground: 215 50% 92%;               /* text */
 
-    --card: 0 0% 100% / 0.96;                /* glassy white */
-    --card-foreground: 210 50% 11%;          /* macon-text */
+    --card: 215 50% 12%;                     /* panel */
+    --card-foreground: 215 50% 92%;          /* text */
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 210 50% 11%;
+    --popover: 215 50% 12%;
+    --popover-foreground: 215 50% 92%;
 
-    --primary: 202 100% 33%;                 /* macon-blue */
-    --primary-foreground: 0 0% 100%;         /* white */
+    --primary: 209 100% 61%;                 /* #3aa4ff */
+    --primary-foreground: 220 100% 7%;       /* dark text on primary */
 
-    --secondary: 201 23% 78%;                /* macon-border */
-    --secondary-foreground: 210 50% 11%;     /* macon-text */
+    --secondary: 215 25% 65%;                /* muted */
+    --secondary-foreground: 215 50% 92%;     /* text */
 
-    --muted: 201 23% 78%;                    /* macon-border */
-    --muted-foreground: 210 50% 25%;         /* darker muted text */
+    --muted: 215 25% 65%;                    /* muted */
+    --muted-foreground: 215 25% 55%;         /* darker muted */
 
-    --accent: 202 100% 33%;                  /* macon-blue */
-    --accent-foreground: 0 0% 100%;          /* white */
+    --accent: 209 100% 61%;                  /* primary */
+    --accent-foreground: 220 100% 7%;       /* dark text */
 
-    --destructive: 4 90% 58%;                /* macon-error */
+    --destructive: 0 100% 68%;               /* danger */
     --destructive-foreground: 0 0% 100%;     /* white */
 
-    --border: 201 23% 78%;                   /* macon-border */
-    --input: 210 22% 89%;                    /* lighter input border */
-    --ring: 202 100% 33%;                    /* macon-blue */
+    --border: 220 40% 25%;                   /* border */
+    --input: 220 40% 25%;                    /* border */
+    --ring: 209 100% 61%;                    /* primary */
 
-    --radius: 0.875rem;                      /* 14px default radius */
-    --radius-sm: 0.625rem;                   /* 10px */
-    --radius-lg: 1.125rem;                   /* 18px */
+    --radius: 1rem;                          /* 16px default radius */
+    --radius-sm: 0.75rem;                    /* 12px */
+    --radius-lg: 1.25rem;                    /* 20px */
 
     /* Spacing system */
-    --spacing-1: 0.375rem;                   /* 6px */
-    --spacing-2: 0.625rem;                   /* 10px */
-    --spacing-3: 0.875rem;                   /* 14px */
-    --spacing-4: 1rem;                       /* 16px */
-    --spacing-5: 1.375rem;                   /* 22px */
-    --spacing-6: 1.75rem;                    /* 28px */
-
-    /* Enhanced 3D Shadows */
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15), 0 4px 16px rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.18), 0 16px 48px rgba(0, 0, 0, 0.12);
-    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.24), 0 32px 64px rgba(0, 0, 0, 0.16);
-    --shadow-xl: 0 24px 72px rgba(0, 0, 0, 0.32), 0 48px 96px rgba(0, 0, 0, 0.20);
-    --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.06);
-    --shadow-button: 0 4px 12px rgba(0, 119, 170, 0.25), 0 2px 6px rgba(0, 0, 0, 0.12);
+    --spacing-1: 0.5rem;                     /* 8px */
+    --spacing-2: 0.75rem;                    /* 12px */
+    --spacing-3: 1rem;                       /* 16px */
+    --spacing-4: 1.25rem;                    /* 20px */
+    --spacing-5: 1.5rem;                     /* 24px */
+    --spacing-6: 2rem;                       /* 32px */
 
     /* Sidebar tokens */
-    --sidebar-background: 0 0% 100% / 0.96;
-    --sidebar-foreground: 210 50% 11%;
-    --sidebar-primary: 202 100% 33%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 201 100% 93%;
-    --sidebar-accent-foreground: 210 50% 11%;
-    --sidebar-border: 201 23% 78%;
-    --sidebar-ring: 202 100% 33%;
+    --sidebar-background: 215 50% 12%;
+    --sidebar-foreground: 215 50% 92%;
+    --sidebar-primary: 209 100% 61%;
+    --sidebar-primary-foreground: 220 100% 7%;
+    --sidebar-accent: 220 40% 25%;
+    --sidebar-accent-foreground: 215 50% 92%;
+    --sidebar-border: 220 40% 25%;
+    --sidebar-ring: 209 100% 61%;
   }
 
   .dark {
@@ -134,14 +129,9 @@ All colors MUST be HSL.
     line-height: 1.42;
     margin: 0;
     min-height: 100%;
-    /* Blue gradient background */
-    background: 
-      radial-gradient(1200px 600px at 20% -10%, hsl(202 80% 60%) 0%, transparent 60%),
-      linear-gradient(180deg, hsl(var(--macon-blue-700)), hsl(var(--macon-blue-900)));
-    background-size: cover, cover;
-    background-repeat: no-repeat;
+    /* Dark gradient background */
+    background: linear-gradient(180deg, hsl(210 65% 10%), hsl(210 70% 6%));
     background-attachment: fixed;
-    background-position: center center, center center;
   }
 
   /* MACON Product Editor Components */
@@ -157,13 +147,14 @@ All colors MUST be HSL.
   .macon-toolbar {
     position: sticky;
     top: 0;
-    z-index: 5;
+    z-index: 10;
     display: flex;
     align-items: center;
     gap: var(--spacing-3);
-    background: hsl(var(--background));
-    padding: var(--spacing-4) 0;
-    border-bottom: 1px solid hsl(var(--macon-divider));
+    padding: 14px var(--spacing-5);
+    border-bottom: 1px solid hsl(var(--border));
+    backdrop-filter: blur(10px);
+    background: rgba(14, 19, 32, 0.7);
   }
 
   /* 3D Enhanced Cards */
@@ -220,25 +211,26 @@ All colors MUST be HSL.
   }
 
   .macon-btn-primary {
-    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--macon-blue-700)));
-    color: hsl(var(--primary-foreground));
-    border: 1px solid hsl(var(--macon-blue-700));
-    box-shadow: 
-      0 4px 16px rgba(0, 119, 170, 0.4),
-      0 2px 8px rgba(0, 0, 0, 0.15),
-      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+    background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--primary-2)));
+    color: hsl(220 100% 7%);
+    border: none;
+    font-weight: 600;
+    box-shadow: var(--shadow-button);
   }
 
   .macon-btn-primary:hover {
-    background: linear-gradient(135deg, hsl(var(--macon-blue-700)), hsl(var(--macon-blue-900)));
-    box-shadow: 
-      0 8px 24px rgba(0, 119, 170, 0.5),
-      0 4px 16px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    background: linear-gradient(90deg, hsl(var(--primary-2)), hsl(var(--primary)));
+    box-shadow: var(--shadow-lg);
+  }
+
+  .macon-btn-outline {
+    background: hsl(215 50% 15%);
+    color: hsl(var(--text));
+    border: 1px solid hsl(var(--border));
   }
 
   .macon-btn-outline:hover {
-    background: linear-gradient(135deg, hsl(var(--macon-blue-light)), rgba(255, 255, 255, 0.8));
+    background: hsl(215 50% 18%);
     border-color: hsl(var(--primary));
   }
 
@@ -249,7 +241,7 @@ All colors MUST be HSL.
   }
 
   .macon-btn-ghost:hover {
-    background: linear-gradient(135deg, hsl(var(--card)), rgba(255, 255, 255, 0.9));
+    background: hsl(215 50% 15%);
     border-color: hsl(var(--border));
     box-shadow: var(--shadow-md);
   }
@@ -270,21 +262,26 @@ All colors MUST be HSL.
   }
 
   .macon-input {
-    @apply w-full px-2.5 py-2 text-foreground;
-    border: 1px solid hsl(var(--input));
-    border-radius: 10px;
-    background: hsl(var(--card));
-    box-shadow: var(--shadow-inset), var(--shadow-sm);
+    @apply w-full text-foreground;
+    padding: 10px 12px;
+    border: 1px solid hsl(var(--border));
+    border-radius: 12px;
+    background: hsl(210 65% 7%);
+    color: hsl(var(--text));
+    box-shadow: var(--shadow-inset);
     transition: all 0.2s ease;
+    outline: none;
   }
 
   .macon-input:focus {
-    @apply outline-none;
     border-color: hsl(var(--primary));
     box-shadow: 
-      0 0 0 4px rgba(0, 119, 170, 0.18),
+      0 0 0 4px rgba(58, 164, 255, 0.18),
       var(--shadow-md);
-    transform: translateY(-1px);
+  }
+
+  .macon-input[readonly] {
+    opacity: 0.8;
   }
 
   .macon-inline {
