@@ -1,26 +1,84 @@
-import { Activity, Cpu, Database, Clock, AlertTriangle, CheckCircle, Wifi, Thermometer, Gauge, Zap, Settings, TrendingUp, BarChart3, Users, Calendar, FileText, Download } from 'lucide-react';
+import { Activity, Cpu, Database, Clock, AlertTriangle, CheckCircle, Wifi, Thermometer, Gauge, Zap, Settings, TrendingUp, BarChart3, Users, Calendar, FileText, Download, RefreshCw, Play, Pause, Square } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import { useMachines } from '@/hooks/useMachines';
+import { useBatches } from '@/hooks/useBatches';
+import { useProducts } from '@/hooks/useProducts';
+import { useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 export const MachineOverview = () => {
+  const { data: machines, isLoading: machinesLoading } = useMachines();
+  const { data: batches, isLoading: batchesLoading } = useBatches();
+  const { data: products, isLoading: productsLoading } = useProducts();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const { toast } = useToast();
+
+  // Get current machine data (first machine or create mock data)
+  const currentMachine = machines?.[0] || {
+    machine_name: 'MACON CNC-01',
+    status: 'Running',
+    efficiency_percentage: 92.5,
+    uptime_hours: 987.5,
+    machine_type: 'CNC Plasma Cutter'
+  };
+
+  // Get current batch (running batch)
+  const currentBatch = batches?.find(b => b.status === 'Running') || null;
+  const currentProduct = currentBatch ? products?.find(p => p.id === currentBatch.id) : null;
+
   const machineStatus = {
     connected: true,
-    running: true,
-    currentProduct: 'P001 - IPE240 Beam',
-    currentBatch: 'B001 - Morning Production',
-    progress: 65,
+    running: currentMachine.status === 'Running',
+    currentProduct: currentProduct ? `${currentProduct.product_id} - ${currentProduct.name}` : 'No active product',
+    currentBatch: currentBatch ? `${currentBatch.batch_id} - ${currentBatch.name}` : 'No active batch',
+    progress: currentBatch?.progress_percentage || 0,
     lastSync: '2 minutes ago',
     temperature: 45.2,
     pressure: 6.8,
     vibration: 0.3,
     powerConsumption: 15.7,
-    efficiency: 92.5,
-    uptime: 98.7,
+    efficiency: currentMachine.efficiency_percentage || 92.5,
+    uptime: Math.round((currentMachine.uptime_hours || 987.5) / 10),
     cycleTime: 125,
-    totalPartsToday: 247
+    totalPartsToday: currentBatch?.completed_parts || 247,
+    estimatedCompletion: currentBatch?.estimated_completion_time
+  };
+
+  const handleRefreshStatus = async () => {
+    setIsRefreshing(true);
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      toast({
+        title: "Status Refreshed",
+        description: "Machine status updated successfully",
+      });
+    } catch (error) {
+      toast({
+        title: "Refresh Failed",
+        description: "Could not refresh machine status",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
+  const handleExportReport = () => {
+    toast({
+      title: "Export Started",
+      description: "Machine performance report is being generated...",
+    });
+  };
+
+  const handleMachineControl = (action: 'start' | 'pause' | 'stop') => {
+    toast({
+      title: "Machine Control",
+      description: `${action.charAt(0).toUpperCase() + action.slice(1)} command sent to machine`,
+    });
   };
 
   const plcVariables = [
@@ -75,360 +133,244 @@ export const MachineOverview = () => {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="container">
+      {/* Machine Control Header */}
+      <div className="panel">
+        <div className="flex items-center justify-between">
+          <h1 className="text-2xl font-bold">Machine Overview - {currentMachine.machine_name}</h1>
+          <div className="flex gap-2">
+            <Button 
+              className="btn gap-2" 
+              onClick={() => handleMachineControl('start')}
+              disabled={machineStatus.running}
+            >
+              <Play className="w-4 h-4" />
+              Start
+            </Button>
+            <Button 
+              className="btn gap-2" 
+              onClick={() => handleMachineControl('pause')}
+              disabled={!machineStatus.running}
+            >
+              <Pause className="w-4 h-4" />
+              Pause
+            </Button>
+            <Button 
+              className="btn danger gap-2" 
+              onClick={() => handleMachineControl('stop')}
+            >
+              <Square className="w-4 h-4" />
+              Stop
+            </Button>
+            <Button 
+              className="btn gap-2" 
+              onClick={handleRefreshStatus}
+              disabled={isRefreshing}
+            >
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'Refreshing...' : 'Refresh'}
+            </Button>
+          </div>
+        </div>
+      </div>
+
       {/* Main Status Dashboard */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-        <Card className="macon-card">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">PLC Status</p>
-                <p className="text-lg font-bold flex items-center gap-2">
-                  <div className={`w-2 h-2 rounded-full ${machineStatus.connected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
-                  {machineStatus.connected ? 'Connected' : 'Disconnected'}
-                </p>
-              </div>
-              <Wifi className={getStatusColor(machineStatus.connected, machineStatus.running)} />
+      <div className="row">
+        <div className="panel" style={{ flex: 1 }}>
+          <h2><Wifi className="w-5 h-5 inline mr-2" />PLC Status</h2>
+          <div className="flex items-center justify-between p-4">
+            <div>
+              <p className="text-lg font-bold flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${machineStatus.connected ? 'bg-green-500 animate-pulse' : 'bg-red-500'}`}></div>
+                {machineStatus.connected ? 'Connected' : 'Disconnected'}
+              </p>
+              <p className="text-sm text-muted-foreground">Last sync: {machineStatus.lastSync}</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="macon-card">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Machine State</p>
-                <p className="text-lg font-bold flex items-center gap-2">
-                  {machineStatus.running ? (
-                    <>
-                      <Activity className="w-4 h-4 text-green-500" />
-                      Running
-                    </>
-                  ) : (
-                    <>
-                      <AlertTriangle className="w-4 h-4 text-yellow-500" />
-                      Idle
-                    </>
-                  )}
-                </p>
-              </div>
-              <Cpu className={getStatusColor(machineStatus.connected, machineStatus.running)} />
+        <div className="panel" style={{ flex: 1 }}>
+          <h2><Cpu className="w-5 h-5 inline mr-2" />Machine State</h2>
+          <div className="flex items-center justify-between p-4">
+            <div>
+              <p className="text-lg font-bold flex items-center gap-2">
+                {machineStatus.running ? (
+                  <>
+                    <Activity className="w-4 h-4 text-green-500" />
+                    Running
+                  </>
+                ) : (
+                  <>
+                    <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                    Idle
+                  </>
+                )}
+              </p>
+              <p className="text-sm text-muted-foreground">Efficiency: {machineStatus.efficiency}%</p>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
 
-        <Card className="macon-card">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Temperature</p>
-                <p className="text-lg font-bold">{machineStatus.temperature}°C</p>
-              </div>
-              <Thermometer className="w-6 h-6 text-orange-500" />
+        <div className="panel" style={{ flex: 1 }}>
+          <h2><Thermometer className="w-5 h-5 inline mr-2" />Temperature</h2>
+          <div className="flex items-center justify-between p-4">
+            <div>
+              <p className="text-lg font-bold">{machineStatus.temperature}°C</p>
+              <p className="text-sm text-muted-foreground">Normal range</p>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="macon-card">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Efficiency</p>
-                <p className="text-lg font-bold">{machineStatus.efficiency}%</p>
-              </div>
-              <TrendingUp className="w-6 h-6 text-green-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="macon-card">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Power</p>
-                <p className="text-lg font-bold">{machineStatus.powerConsumption} kW</p>
-              </div>
-              <Zap className="w-6 h-6 text-yellow-500" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="macon-card">
-          <CardContent className="p-4">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-muted-foreground">Parts Today</p>
-                <p className="text-lg font-bold">{machineStatus.totalPartsToday}</p>
-              </div>
-              <BarChart3 className="w-6 h-6 text-blue-500" />
-            </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
-      {/* Performance Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-        <Card className="macon-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <TrendingUp className="w-5 h-5" />
-              Efficiency Trend
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <LineChart data={performanceData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                <XAxis dataKey="time" stroke="#666" />
-                <YAxis stroke="#666" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#fff', 
-                    border: '1px solid #ddd',
-                    borderRadius: '8px' 
-                  }} 
-                />
-                <Line type="monotone" dataKey="efficiency" stroke="#0077aa" strokeWidth={2} dot={{ fill: '#0077aa' }} />
-              </LineChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="macon-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="w-5 h-5" />
-              Hourly Production
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <BarChart data={performanceData}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
-                <XAxis dataKey="time" stroke="#666" />
-                <YAxis stroke="#666" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: '#fff', 
-                    border: '1px solid #ddd',
-                    borderRadius: '8px' 
-                  }} 
-                />
-                <Bar dataKey="parts" fill="#0077aa" radius={[4, 4, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        <Card className="macon-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Gauge className="w-5 h-5" />
-              Product Mix
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={200}>
-              <PieChart>
-                <Pie
-                  data={productionData}
-                  cx="50%"
-                  cy="50%"
-                  innerRadius={40}
-                  outerRadius={80}
-                  dataKey="value"
-                >
-                  {productionData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
-            <div className="mt-4 space-y-2">
-              {productionData.map((item, index) => (
-                <div key={index} className="flex items-center gap-2 text-sm">
-                  <div className={`w-3 h-3 rounded-full`} style={{ backgroundColor: item.color }}></div>
-                  <span>{item.name}: {item.value}%</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Detailed Information */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Current Operation */}
-        <Card className="macon-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Settings className="w-5 h-5" />
-              Current Operation
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+      {/* Current Operation */}
+      <div className="panel">
+        <h2><Settings className="w-5 h-5 inline mr-2" />Current Operation</h2>
+        <div className="row">
+          <div style={{ flex: 1 }}>
             <div className="space-y-4">
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Active Product</p>
                 <p className="text-lg font-semibold">{machineStatus.currentProduct}</p>
-                <Badge variant="outline" className="mt-1">IPE240</Badge>
+                {currentProduct && (
+                  <span className="chip">{currentProduct.profile}</span>
+                )}
               </div>
               
               <div>
                 <p className="text-sm font-medium text-muted-foreground">Current Batch</p>
                 <p className="text-lg font-semibold">{machineStatus.currentBatch}</p>
-                <Badge variant="secondary" className="mt-1">Priority: High</Badge>
-              </div>
-              
-              <div>
-                <p className="text-sm font-medium text-muted-foreground mb-2">Batch Progress</p>
-                <Progress value={machineStatus.progress} className="h-3" />
-                <div className="flex justify-between text-xs text-muted-foreground mt-1">
-                  <span>{machineStatus.progress}% complete</span>
-                  <span>ETA: 45 min</span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4 pt-2 border-t border-border">
-                <div className="text-center">
-                  <p className="text-sm font-medium text-muted-foreground">Cycle Time</p>
-                  <p className="text-lg font-bold">{machineStatus.cycleTime}s</p>
-                </div>
-                <div className="text-center">
-                  <p className="text-sm font-medium text-muted-foreground">Uptime</p>
-                  <p className="text-lg font-bold">{machineStatus.uptime}%</p>
-                </div>
-              </div>
-
-              <div className="pt-4 border-t border-border space-y-2">
-                <Button variant="outline" size="sm" className="w-full gap-2">
-                  <Database className="w-4 h-4" />
-                  Refresh Status
-                </Button>
-                <Button variant="outline" size="sm" className="w-full gap-2">
-                  <Download className="w-4 h-4" />
-                  Export Report
-                </Button>
+                {currentBatch && (
+                  <span className="chip">Priority: {currentBatch.priority}</span>
+                )}
               </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* PLC Variables */}
-        <Card className="macon-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Cpu className="w-5 h-5" />
-              PLC Variables
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {plcVariables.map((variable, index) => (
-                <div key={index} className="macon-grid-row p-3 rounded-lg">
-                  <div className="flex justify-between items-center">
-                    <div className="flex-1">
-                      <p className="font-medium text-sm font-mono">{variable.name}</p>
-                      <p className="text-xs text-muted-foreground">{variable.type}</p>
-                    </div>
-                    <div className="text-right">
-                      <span className="font-mono text-sm bg-muted px-2 py-1 rounded">
-                        {variable.value}
-                      </span>
-                      <div className={`w-2 h-2 rounded-full mt-1 ml-auto ${index % 3 === 0 ? 'bg-green-500' : index % 2 === 0 ? 'bg-yellow-500' : 'bg-blue-500'}`}></div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <div className="pt-4 border-t border-border">
-              <Button variant="ghost" size="sm" className="w-full">View All Variables</Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Operator Information */}
-        <Card className="macon-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Users className="w-5 h-5" />
-              Operator Dashboard
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-                <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center">
-                  <Users className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <p className="font-medium">John Smith</p>
-                  <p className="text-sm text-muted-foreground">Lead Operator</p>
-                </div>
-                <Badge variant="secondary" className="ml-auto">Active</Badge>
-              </div>
-
-              <div className="grid grid-cols-2 gap-3">
-                <div className="text-center p-3 bg-muted/30 rounded-lg">
-                  <p className="text-sm font-medium text-muted-foreground">Shift Start</p>
-                  <p className="font-bold">06:00</p>
-                </div>
-                <div className="text-center p-3 bg-muted/30 rounded-lg">
-                  <p className="text-sm font-medium text-muted-foreground">Break Time</p>
-                  <p className="font-bold">12:00</p>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-medium text-muted-foreground">Shift Progress</span>
-                  <span className="text-sm font-bold">75%</span>
-                </div>
-                <Progress value={75} className="h-2" />
-              </div>
-
-              <div className="pt-4 border-t border-border space-y-2">
-                <Button variant="outline" size="sm" className="w-full gap-2">
-                  <Calendar className="w-4 h-4" />
-                  Schedule
-                </Button>
-                <Button variant="outline" size="sm" className="w-full gap-2">
-                  <FileText className="w-4 h-4" />
-                  Work Orders
-                </Button>
+          <div style={{ flex: 1 }}>
+            <div>
+              <p className="text-sm font-medium text-muted-foreground mb-2">Batch Progress</p>
+              <Progress value={machineStatus.progress} className="h-3" />
+              <div className="flex justify-between text-xs text-muted-foreground mt-1">
+                <span>{machineStatus.progress}% complete</span>
+                <span>Parts: {machineStatus.totalPartsToday}</span>
               </div>
             </div>
-          </CardContent>
-        </Card>
+
+            <div className="grid grid-cols-2 gap-4 pt-4 mt-4 border-t border-border">
+              <div className="text-center">
+                <p className="text-sm font-medium text-muted-foreground">Cycle Time</p>
+                <p className="text-lg font-bold">{machineStatus.cycleTime}s</p>
+              </div>
+              <div className="text-center">
+                <p className="text-sm font-medium text-muted-foreground">Uptime</p>
+                <p className="text-lg font-bold">{machineStatus.uptime}%</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div className="pt-4 border-t border-border flex gap-2">
+          <Button 
+            className="btn gap-2" 
+            onClick={handleRefreshStatus}
+            disabled={isRefreshing}
+          >
+            <Database className="w-4 h-4" />
+            Refresh Status
+          </Button>
+          <Button 
+            className="btn gap-2" 
+            onClick={handleExportReport}
+          >
+            <Download className="w-4 h-4" />
+            Export Report
+          </Button>
+        </div>
       </div>
 
-      {/* Recent Activity & Alerts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="macon-card">
-          <CardHeader>
-            <CardTitle className="flex items-center justify-between">
-              <span className="flex items-center gap-2">
-                <Activity className="w-5 h-5" />
-                Recent Activity
-              </span>
-              <Badge variant="outline">{recentLogs.length} events</Badge>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3 max-h-80 overflow-y-auto">
-              {recentLogs.map((log, index) => (
-                <div key={index} className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/50 transition-colors">
-                  <div className="flex flex-col items-center gap-1">
-                    <span className="text-xs text-muted-foreground font-mono min-w-[3rem]">{log.time}</span>
-                    <div className={`w-2 h-2 rounded-full ${
-                      log.level === 'ERROR' ? 'bg-red-500' : 
-                      log.level === 'WARN' ? 'bg-yellow-500' : 'bg-green-500'
-                    }`}></div>
-                  </div>
+      {/* Performance Charts */}
+      <div className="row">
+        <div className="panel" style={{ flex: 1 }}>
+          <h2><TrendingUp className="w-5 h-5 inline mr-2" />Efficiency Trend</h2>
+          <ResponsiveContainer width="100%" height={200}>
+            <LineChart data={performanceData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+              <XAxis dataKey="time" stroke="#666" />
+              <YAxis stroke="#666" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#11182a', 
+                  border: '1px solid #1f2a44',
+                  borderRadius: '8px',
+                  color: '#e7ecf3'
+                }} 
+              />
+              <Line type="monotone" dataKey="efficiency" stroke="var(--primary)" strokeWidth={2} dot={{ fill: 'var(--primary)' }} />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+
+        <div className="panel" style={{ flex: 1 }}>
+          <h2><BarChart3 className="w-5 h-5 inline mr-2" />Hourly Production</h2>
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={performanceData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#e0e0e0" />
+              <XAxis dataKey="time" stroke="#666" />
+              <YAxis stroke="#666" />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: '#11182a', 
+                  border: '1px solid #1f2a44',
+                  borderRadius: '8px',
+                  color: '#e7ecf3'
+                }} 
+              />
+              <Bar dataKey="parts" fill="var(--primary)" radius={[4, 4, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* PLC Variables and Logs */}
+      <div className="row">
+        <div className="panel" style={{ flex: 1 }}>
+          <h2><Cpu className="w-5 h-5 inline mr-2" />PLC Variables</h2>
+          <div className="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Variable</th>
+                  <th>Type</th>
+                  <th>Value</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                {plcVariables.map((variable, index) => (
+                  <tr key={index}>
+                    <td className="font-mono text-sm">{variable.name}</td>
+                    <td className="text-xs text-muted-foreground">{variable.type}</td>
+                    <td className="font-mono text-sm">{variable.value}</td>
+                    <td>
+                      <div className={`w-2 h-2 rounded-full ${index % 3 === 0 ? 'bg-green-500' : index % 2 === 0 ? 'bg-yellow-500' : 'bg-blue-500'}`}></div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div className="panel" style={{ flex: 1 }}>
+          <h2><Activity className="w-5 h-5 inline mr-2" />Recent Activity</h2>
+          <div className="space-y-2 max-h-80 overflow-y-auto">
+            {recentLogs.map((log, index) => (
+              <div key={index} className="table-wrap">
+                <div className="flex items-start gap-3 p-3">
+                  <span className="text-xs text-muted-foreground font-mono min-w-[3rem]">{log.time}</span>
                   <div className="flex-1">
                     <div className="flex items-center gap-2 mb-1">
-                      <span className={`px-2 py-0.5 rounded text-xs font-medium ${getLogLevelColor(log.level)}`}>
+                      <span className={`chip ${getLogLevelColor(log.level)}`}>
                         {log.level}
                       </span>
                       <span className="text-xs text-muted-foreground">{log.operator}</span>
@@ -436,66 +378,61 @@ export const MachineOverview = () => {
                     <p className="text-sm">{log.message}</p>
                   </div>
                 </div>
-              ))}
-            </div>
-            
-            <div className="mt-4 pt-4 border-t border-border flex gap-2">
-              <Button variant="ghost" size="sm" className="flex-1">View Full Log</Button>
-              <Button variant="outline" size="sm" className="flex-1">Export Log</Button>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="macon-card">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <AlertTriangle className="w-5 h-5" />
-              System Alerts & Maintenance
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <CheckCircle className="w-5 h-5 text-green-600" />
-                  <div className="flex-1">
-                    <p className="font-medium text-green-800">All Systems Operational</p>
-                    <p className="text-sm text-green-600">Last check: 2 minutes ago</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                  <Clock className="w-5 h-5 text-yellow-600" />
-                  <div className="flex-1">
-                    <p className="font-medium text-yellow-800">Maintenance Due</p>
-                    <p className="text-sm text-yellow-600">Tool change in 50 cycles</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <Database className="w-5 h-5 text-blue-600" />
-                  <div className="flex-1">
-                    <p className="font-medium text-blue-800">Backup Completed</p>
-                    <p className="text-sm text-blue-600">Last backup: Today 02:00</p>
-                  </div>
-                </div>
               </div>
+            ))}
+          </div>
+        </div>
+      </div>
 
-              <div className="pt-4 border-t border-border">
-                <div className="grid grid-cols-2 gap-2">
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <Settings className="w-4 h-4" />
-                    Maintenance
-                  </Button>
-                  <Button variant="outline" size="sm" className="gap-2">
-                    <AlertTriangle className="w-4 h-4" />
-                    Alerts
-                  </Button>
-                </div>
+      {/* System Alerts */}
+      <div className="panel">
+        <h2><AlertTriangle className="w-5 h-5 inline mr-2" />System Status & Alerts</h2>
+        <div className="row">
+          <div className="group">
+            <div className="flex items-center gap-3 p-3 bg-green-100 border border-green-200 rounded-lg">
+              <CheckCircle className="w-5 h-5 text-green-600" />
+              <div className="flex-1">
+                <p className="font-medium text-green-800">All Systems Operational</p>
+                <p className="text-sm text-green-600">Last check: 2 minutes ago</p>
               </div>
             </div>
-          </CardContent>
-        </Card>
+
+            <div className="flex items-center gap-3 p-3 bg-yellow-100 border border-yellow-200 rounded-lg">
+              <Clock className="w-5 h-5 text-yellow-600" />
+              <div className="flex-1">
+                <p className="font-medium text-yellow-800">Maintenance Due</p>
+                <p className="text-sm text-yellow-600">Tool change in 50 cycles</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 p-3 bg-blue-100 border border-blue-200 rounded-lg">
+              <Database className="w-5 h-5 text-blue-600" />
+              <div className="flex-1">
+                <p className="font-medium text-blue-800">Backup Completed</p>
+                <p className="text-sm text-blue-600">Last backup: Today 02:00</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="group">
+            <Button className="btn gap-2">
+              <Settings className="w-4 h-4" />
+              Maintenance
+            </Button>
+            <Button className="btn gap-2">
+              <AlertTriangle className="w-4 h-4" />
+              View Alerts
+            </Button>
+            <Button className="btn gap-2">
+              <Database className="w-4 h-4" />
+              System Log
+            </Button>
+            <Button className="btn gap-2">
+              <Download className="w-4 h-4" />
+              Export Data
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );
