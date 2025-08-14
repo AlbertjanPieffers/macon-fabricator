@@ -65,9 +65,13 @@ All colors MUST be HSL.
     --spacing-5: 1.375rem;                   /* 22px */
     --spacing-6: 1.75rem;                    /* 28px */
 
-    /* Shadows */
-    --shadow-sm: 0 2px 12px rgba(0, 0, 0, 0.18);
-    --shadow-md: 0 12px 32px rgba(0, 0, 0, 0.24);
+    /* Enhanced 3D Shadows */
+    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.15), 0 4px 16px rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.18), 0 16px 48px rgba(0, 0, 0, 0.12);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.24), 0 32px 64px rgba(0, 0, 0, 0.16);
+    --shadow-xl: 0 24px 72px rgba(0, 0, 0, 0.32), 0 48px 96px rgba(0, 0, 0, 0.20);
+    --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+    --shadow-button: 0 4px 12px rgba(0, 119, 170, 0.25), 0 2px 6px rgba(0, 0, 0, 0.12);
 
     /* Sidebar tokens */
     --sidebar-background: 0 0% 100% / 0.96;
@@ -162,13 +166,20 @@ All colors MUST be HSL.
     border-bottom: 1px solid hsl(var(--macon-divider));
   }
 
-  /* Cards */
+  /* 3D Enhanced Cards */
   .macon-card {
     background: hsl(var(--card));
     border: 1px solid hsl(var(--border));
     border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-md);
     padding: var(--spacing-5);
+    transform: translateZ(0);
+    transition: all 0.3s ease;
+  }
+
+  .macon-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
   }
 
   .macon-split {
@@ -177,40 +188,70 @@ All colors MUST be HSL.
     grid-template-columns: 420px 1fr;
   }
 
-  /* Buttons */
+  /* 3D Enhanced Buttons */
   .macon-btn {
-    @apply inline-flex items-center gap-2 px-3.5 py-2 rounded-lg text-sm font-medium cursor-pointer select-none transition-all;
+    @apply inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium cursor-pointer select-none;
     border: 1px solid hsl(var(--primary));
+    border-radius: 12px;
     background: transparent;
     color: hsl(var(--primary));
+    box-shadow: var(--shadow-button);
+    transform: translateZ(0);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .macon-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 
+      0 6px 20px rgba(0, 119, 170, 0.3), 
+      0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+
+  .macon-btn:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-inset);
   }
 
   .macon-btn:disabled {
     opacity: 0.55;
     cursor: not-allowed;
+    transform: none;
+    box-shadow: var(--shadow-sm);
   }
 
   .macon-btn-primary {
-    background: hsl(var(--primary));
+    background: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--macon-blue-700)));
     color: hsl(var(--primary-foreground));
+    border: 1px solid hsl(var(--macon-blue-700));
+    box-shadow: 
+      0 4px 16px rgba(0, 119, 170, 0.4),
+      0 2px 8px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
   }
 
   .macon-btn-primary:hover {
-    background: hsl(var(--macon-blue-dark));
+    background: linear-gradient(135deg, hsl(var(--macon-blue-700)), hsl(var(--macon-blue-900)));
+    box-shadow: 
+      0 8px 24px rgba(0, 119, 170, 0.5),
+      0 4px 16px rgba(0, 0, 0, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
   }
 
   .macon-btn-outline:hover {
-    background: hsl(var(--macon-blue-light));
+    background: linear-gradient(135deg, hsl(var(--macon-blue-light)), rgba(255, 255, 255, 0.8));
+    border-color: hsl(var(--primary));
   }
 
   .macon-btn-ghost {
     border-color: transparent;
     color: hsl(var(--muted-foreground));
+    box-shadow: var(--shadow-sm);
   }
 
   .macon-btn-ghost:hover {
-    background: hsl(var(--card));
-    border-color: hsl(var(--macon-divider));
+    background: linear-gradient(135deg, hsl(var(--card)), rgba(255, 255, 255, 0.9));
+    border-color: hsl(var(--border));
+    box-shadow: var(--shadow-md);
   }
 
   /* Forms */
@@ -229,11 +270,21 @@ All colors MUST be HSL.
   }
 
   .macon-input {
-    @apply w-full px-2.5 py-2 rounded-lg border border-input bg-card text-foreground;
+    @apply w-full px-2.5 py-2 text-foreground;
+    border: 1px solid hsl(var(--input));
+    border-radius: 10px;
+    background: hsl(var(--card));
+    box-shadow: var(--shadow-inset), var(--shadow-sm);
+    transition: all 0.2s ease;
   }
 
   .macon-input:focus {
-    @apply outline-none border-primary ring-2 ring-primary/15;
+    @apply outline-none;
+    border-color: hsl(var(--primary));
+    box-shadow: 
+      0 0 0 4px rgba(0, 119, 170, 0.18),
+      var(--shadow-md);
+    transform: translateY(-1px);
   }
 
   .macon-inline {
@@ -311,13 +362,20 @@ All colors MUST be HSL.
     text-overflow: ellipsis;
   }
 
-  /* Preview Panel */
+  /* 3D Enhanced Preview Panel */
   .macon-preview {
     border: 1px solid hsl(var(--border));
     border-radius: var(--radius);
     background: hsl(var(--card));
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--shadow-lg);
     padding: var(--spacing-4);
+    transform: translateZ(0);
+    transition: all 0.3s ease;
+  }
+
+  .macon-preview:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xl);
   }
 
   .macon-canvas-wrap {
