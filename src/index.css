@@ -8,49 +8,39 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* Exact colors from your example */
-    --bg: #0e1320;
-    --panel: #11182a;
-    --muted: #92a1b2;
-    --text: #e7ecf3;
-    --primary: #3aa4ff;
-    --primary-2: #00d084;
-    --danger: #ff5f5f;
-    --border: #1f2a44;
-    --shadow: 0 10px 30px rgba(0,0,0,.25);
-    --radius: 16px;
-    --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
-
-    /* Convert to HSL for Tailwind compatibility */
-    --background: 220 50% 9%;              /* bg */
-    --foreground: 220 40% 90%;             /* text */
-    --card: 220 50% 12%;                   /* panel */
-    --card-foreground: 220 40% 90%;        /* text */
-    --popover: 220 50% 12%;                /* panel */
-    --popover-foreground: 220 40% 90%;     /* text */
-    --primary: 209 100% 61%;               /* primary */
-    --primary-foreground: 220 100% 7%;     /* dark text on primary */
-    --secondary: 220 20% 60%;              /* muted */
-    --secondary-foreground: 220 40% 90%;   /* text */
-    --muted: 220 20% 60%;                  /* muted */
-    --muted-foreground: 220 20% 60%;       /* muted */
-    --accent: 209 100% 61%;                /* primary */
-    --accent-foreground: 220 100% 7%;      /* dark text */
-    --destructive: 0 100% 67%;             /* danger */
+    /* MACON Office Interface Colors - HSL based */
+    /* Background: #082231 -> HSL(200, 57%, 11%) */
+    /* Cards: #0c3550 -> HSL(200, 67%, 19%) */
+    
+    --background: 200 57% 11%;             /* #082231 */
+    --foreground: 0 0% 100%;               /* white text */
+    --card: 200 67% 19%;                   /* #0c3550 */
+    --card-foreground: 0 0% 100%;          /* white text */
+    --popover: 200 67% 19%;                /* same as card */
+    --popover-foreground: 0 0% 100%;       /* white text */
+    --primary: 209 100% 61%;               /* bright blue accent */
+    --primary-foreground: 200 57% 11%;     /* dark text on primary */
+    --secondary: 200 40% 40%;              /* muted blue */
+    --secondary-foreground: 0 0% 100%;     /* white text */
+    --muted: 200 40% 40%;                  /* muted blue */
+    --muted-foreground: 200 20% 70%;       /* lighter muted text */
+    --accent: 209 100% 61%;                /* same as primary */
+    --accent-foreground: 200 57% 11%;      /* dark text */
+    --destructive: 0 84% 60%;              /* red */
     --destructive-foreground: 0 0% 100%;   /* white */
-    --border: 220 40% 25%;                 /* border */
-    --input: 220 40% 25%;                  /* border */
-    --ring: 209 100% 61%;                  /* primary */
-    --radius: 1rem;                        /* 16px */
+    --border: 200 30% 30%;                 /* subtle border */
+    --input: 200 30% 30%;                  /* input border */
+    --ring: 209 100% 61%;                  /* focus ring */
+    --radius: 1rem;                        /* 16px rounded corners */
 
     /* Sidebar tokens */
-    --sidebar-background: 220 50% 12%;
-    --sidebar-foreground: 220 40% 90%;
+    --sidebar-background: 200 67% 19%;
+    --sidebar-foreground: 0 0% 100%;
     --sidebar-primary: 209 100% 61%;
-    --sidebar-primary-foreground: 220 100% 7%;
-    --sidebar-accent: 220 40% 25%;
-    --sidebar-accent-foreground: 220 40% 90%;
-    --sidebar-border: 220 40% 25%;
+    --sidebar-primary-foreground: 200 57% 11%;
+    --sidebar-accent: 200 30% 30%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 200 30% 30%;
     --sidebar-ring: 209 100% 61%;
   }
 
@@ -99,12 +89,11 @@ All colors MUST be HSL.
   }
 
   body {
+    @apply bg-background text-foreground;
     margin: 0;
-    background: linear-gradient(180deg, var(--bg), #0b1020);
-    color: var(--text);
-    font-family: var(--font);
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
     line-height: 1.42;
-    min-height: 100%;
+    min-height: 100vh;
   }
 
   /* Apply exact styling from your CSS example */
