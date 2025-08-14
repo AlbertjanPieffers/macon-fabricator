@@ -8,73 +8,48 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
-    /* MACON Dark Modern Theme */
-    --bg: 210 65% 10%;                       /* #0e1320 */
-    --panel: 215 50% 12%;                    /* #11182a */
-    --muted: 215 25% 65%;                    /* #92a1b2 */
-    --text: 215 50% 92%;                     /* #e7ecf3 */
-    --primary: 209 100% 61%;                 /* #3aa4ff */
-    --primary-2: 162 100% 41%;               /* #00d084 */
-    --danger: 0 100% 68%;                    /* #ff5f5f */
-    --border: 220 40% 25%;                   /* #1f2a44 */
-    
-    /* Enhanced shadows and effects */
-    --shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
-    --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.15);
-    --shadow-md: 0 8px 24px rgba(0, 0, 0, 0.20);
-    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.30);
-    --shadow-xl: 0 24px 72px rgba(0, 0, 0, 0.40);
-    --shadow-button: 0 6px 20px rgba(58, 164, 255, 0.25);
-    --shadow-inset: inset 0 2px 4px rgba(0, 0, 0, 0.1);
-    
-    /* Semantic tokens mapped to dark theme */
-    --background: 210 65% 8%;                /* darker bg gradient */
-    --foreground: 215 50% 92%;               /* text */
+    /* Exact colors from your example */
+    --bg: #0e1320;
+    --panel: #11182a;
+    --muted: #92a1b2;
+    --text: #e7ecf3;
+    --primary: #3aa4ff;
+    --primary-2: #00d084;
+    --danger: #ff5f5f;
+    --border: #1f2a44;
+    --shadow: 0 10px 30px rgba(0,0,0,.25);
+    --radius: 16px;
+    --font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
 
-    --card: 215 50% 12%;                     /* panel */
-    --card-foreground: 215 50% 92%;          /* text */
-
-    --popover: 215 50% 12%;
-    --popover-foreground: 215 50% 92%;
-
-    --primary: 209 100% 61%;                 /* #3aa4ff */
-    --primary-foreground: 220 100% 7%;       /* dark text on primary */
-
-    --secondary: 215 25% 65%;                /* muted */
-    --secondary-foreground: 215 50% 92%;     /* text */
-
-    --muted: 215 25% 65%;                    /* muted */
-    --muted-foreground: 215 25% 55%;         /* darker muted */
-
-    --accent: 209 100% 61%;                  /* primary */
-    --accent-foreground: 220 100% 7%;       /* dark text */
-
-    --destructive: 0 100% 68%;               /* danger */
-    --destructive-foreground: 0 0% 100%;     /* white */
-
-    --border: 220 40% 25%;                   /* border */
-    --input: 220 40% 25%;                    /* border */
-    --ring: 209 100% 61%;                    /* primary */
-
-    --radius: 1rem;                          /* 16px default radius */
-    --radius-sm: 0.75rem;                    /* 12px */
-    --radius-lg: 1.25rem;                    /* 20px */
-
-    /* Spacing system */
-    --spacing-1: 0.5rem;                     /* 8px */
-    --spacing-2: 0.75rem;                    /* 12px */
-    --spacing-3: 1rem;                       /* 16px */
-    --spacing-4: 1.25rem;                    /* 20px */
-    --spacing-5: 1.5rem;                     /* 24px */
-    --spacing-6: 2rem;                       /* 32px */
+    /* Convert to HSL for Tailwind compatibility */
+    --background: 220 50% 9%;              /* bg */
+    --foreground: 220 40% 90%;             /* text */
+    --card: 220 50% 12%;                   /* panel */
+    --card-foreground: 220 40% 90%;        /* text */
+    --popover: 220 50% 12%;                /* panel */
+    --popover-foreground: 220 40% 90%;     /* text */
+    --primary: 209 100% 61%;               /* primary */
+    --primary-foreground: 220 100% 7%;     /* dark text on primary */
+    --secondary: 220 20% 60%;              /* muted */
+    --secondary-foreground: 220 40% 90%;   /* text */
+    --muted: 220 20% 60%;                  /* muted */
+    --muted-foreground: 220 20% 60%;       /* muted */
+    --accent: 209 100% 61%;                /* primary */
+    --accent-foreground: 220 100% 7%;      /* dark text */
+    --destructive: 0 100% 67%;             /* danger */
+    --destructive-foreground: 0 0% 100%;   /* white */
+    --border: 220 40% 25%;                 /* border */
+    --input: 220 40% 25%;                  /* border */
+    --ring: 209 100% 61%;                  /* primary */
+    --radius: 1rem;                        /* 16px */
 
     /* Sidebar tokens */
-    --sidebar-background: 215 50% 12%;
-    --sidebar-foreground: 215 50% 92%;
+    --sidebar-background: 220 50% 12%;
+    --sidebar-foreground: 220 40% 90%;
     --sidebar-primary: 209 100% 61%;
     --sidebar-primary-foreground: 220 100% 7%;
     --sidebar-accent: 220 40% 25%;
-    --sidebar-accent-foreground: 215 50% 92%;
+    --sidebar-accent-foreground: 220 40% 90%;
     --sidebar-border: 220 40% 25%;
     --sidebar-ring: 209 100% 61%;
   }
@@ -124,311 +99,220 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply text-foreground font-sans;
-    font-family: "Segoe UI", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-    line-height: 1.42;
     margin: 0;
+    background: linear-gradient(180deg, var(--bg), #0b1020);
+    color: var(--text);
+    font-family: var(--font);
+    line-height: 1.42;
     min-height: 100%;
-    /* Dark gradient background */
-    background: linear-gradient(180deg, hsl(210 65% 10%), hsl(210 70% 6%));
-    background-attachment: fixed;
   }
 
-  /* MACON Product Editor Components */
+  /* Apply exact styling from your CSS example */
   
-  /* App Shell */
-  .macon-app {
-    max-width: 1280px;
-    margin: 0 auto;
-    display: grid;
-    gap: var(--spacing-6);
-  }
-
-  .macon-toolbar {
-    position: sticky;
-    top: 0;
-    z-index: 10;
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-3);
-    padding: 14px var(--spacing-5);
-    border-bottom: 1px solid hsl(var(--border));
-    backdrop-filter: blur(10px);
-    background: rgba(14, 19, 32, 0.7);
-  }
-
-  /* 3D Enhanced Cards */
-  .macon-card {
-    background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    border-radius: var(--radius);
-    box-shadow: var(--shadow-md);
-    padding: var(--spacing-5);
-    transform: translateZ(0);
-    transition: all 0.3s ease;
-  }
-
-  .macon-card:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
-  }
-
-  .macon-split {
-    display: grid;
-    gap: var(--spacing-6);
-    grid-template-columns: 420px 1fr;
-  }
-
-  /* 3D Enhanced Buttons */
-  .macon-btn {
-    @apply inline-flex items-center gap-2 px-3.5 py-2 text-sm font-medium cursor-pointer select-none;
-    border: 1px solid hsl(var(--primary));
-    border-radius: 12px;
-    background: transparent;
-    color: hsl(var(--primary));
-    box-shadow: var(--shadow-button);
-    transform: translateZ(0);
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-  }
-
-  .macon-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 
-      0 6px 20px rgba(0, 119, 170, 0.3), 
-      0 4px 12px rgba(0, 0, 0, 0.15);
-  }
-
-  .macon-btn:active {
-    transform: translateY(0);
-    box-shadow: var(--shadow-inset);
-  }
-
-  .macon-btn:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: var(--shadow-sm);
-  }
-
-  .macon-btn-primary {
-    background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--primary-2)));
-    color: hsl(220 100% 7%);
-    border: none;
-    font-weight: 600;
-    box-shadow: var(--shadow-button);
-  }
-
-  .macon-btn-primary:hover {
-    background: linear-gradient(90deg, hsl(var(--primary-2)), hsl(var(--primary)));
-    box-shadow: var(--shadow-lg);
-  }
-
-  .macon-btn-outline {
-    background: hsl(215 50% 15%);
-    color: hsl(var(--text));
-    border: 1px solid hsl(var(--border));
-  }
-
-  .macon-btn-outline:hover {
-    background: hsl(215 50% 18%);
-    border-color: hsl(var(--primary));
-  }
-
-  .macon-btn-ghost {
-    border-color: transparent;
-    color: hsl(var(--muted-foreground));
-    box-shadow: var(--shadow-sm);
-  }
-
-  .macon-btn-ghost:hover {
-    background: hsl(215 50% 15%);
-    border-color: hsl(var(--border));
-    box-shadow: var(--shadow-md);
-  }
-
-  /* Forms */
-  .macon-form {
-    display: grid;
-    gap: var(--spacing-4);
-  }
-
-  .macon-field {
-    display: grid;
-    gap: 6px;
-  }
-
-  .macon-label {
-    @apply text-xs text-muted-foreground;
-  }
-
-  .macon-input {
-    @apply w-full text-foreground;
-    padding: 10px 12px;
-    border: 1px solid hsl(var(--border));
-    border-radius: 12px;
-    background: hsl(210 65% 7%);
-    color: hsl(var(--text));
-    box-shadow: var(--shadow-inset);
-    transition: all 0.2s ease;
-    outline: none;
-  }
-
-  .macon-input:focus {
-    border-color: hsl(var(--primary));
-    box-shadow: 
-      0 0 0 4px rgba(58, 164, 255, 0.18),
-      var(--shadow-md);
-  }
-
-  .macon-input[readonly] {
-    opacity: 0.8;
-  }
-
-  .macon-inline {
-    display: grid;
-    gap: var(--spacing-3);
-    grid-template-columns: 1fr 1fr;
-  }
-
-  /* Tabs */
-  .macon-tabs {
-    display: flex;
-    gap: 18px;
-    border-bottom: 1px solid hsl(var(--macon-divider));
-    margin-bottom: var(--spacing-4);
-  }
-
-  .macon-tab {
-    padding: 10px 2px;
-    cursor: pointer;
-    color: hsl(var(--muted-foreground));
-    border-bottom: 2px solid transparent;
-    transition: border 0.15s;
-  }
-
-  .macon-tab.active {
-    color: hsl(var(--foreground));
-    border-color: hsl(var(--primary));
-    font-weight: 600;
-  }
-
-  /* Datagrid */
-  .macon-datagrid {
-    --row-height: 36px;
-    border: 1px solid hsl(var(--border));
-    border-radius: var(--radius);
-    overflow: hidden;
-    background: hsl(var(--card));
-  }
-
-  .macon-datagrid-header {
-    background: hsl(213 43% 98%);
-    border-bottom: 1px solid hsl(var(--macon-divider));
-  }
-
-  .macon-datagrid-row {
-    display: grid;
-    align-items: center;
-    min-height: var(--row-height);
-    border-bottom: 1px solid hsl(var(--macon-divider));
-  }
-
-  .macon-datagrid-row:nth-child(even) {
-    background: hsl(213 43% 99%);
-  }
-
-  .macon-datagrid-row.selected {
-    background: hsl(var(--macon-blue-light));
-    position: relative;
-  }
-
-  .macon-datagrid-row.selected::before {
-    content: "";
-    position: absolute;
-    left: 0;
-    top: 0;
-    bottom: 0;
-    width: 3px;
-    background: hsl(var(--primary));
-  }
-
-  .macon-datagrid-cell {
-    padding: 6px 10px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  /* 3D Enhanced Preview Panel */
-  .macon-preview {
-    border: 1px solid hsl(var(--border));
-    border-radius: var(--radius);
-    background: hsl(var(--card));
-    box-shadow: var(--shadow-lg);
-    padding: var(--spacing-4);
-    transform: translateZ(0);
-    transition: all 0.3s ease;
-  }
-
-  .macon-preview:hover {
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-xl);
-  }
-
-  .macon-canvas-wrap {
-    position: relative;
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    background: hsl(var(--card));
-  }
-
-  .macon-canvas-grid {
-    background-image:
-      linear-gradient(to right, hsl(210 22% 95%) 1px, transparent 1px),
-      linear-gradient(to bottom, hsl(210 22% 95%) 1px, transparent 1px);
-    background-size: 16px 16px;
-  }
-
-  /* Status Chips */
-  .macon-chip {
-    @apply inline-flex items-center px-2 py-1 text-xs rounded-full border;
-    background: hsl(var(--card));
-    color: hsl(var(--muted-foreground));
-    border-color: hsl(var(--macon-divider));
-  }
-
-  .macon-chip-success {
-    border-color: hsl(var(--macon-success));
-    color: hsl(120 61% 35%);
-    background: hsl(120 61% 96%);
-  }
-
-  .macon-chip-warning {
-    border-color: hsl(var(--macon-warning));
-    color: hsl(43 96% 35%);
-    background: hsl(43 96% 96%);
-  }
-
-  .macon-chip-error {
-    border-color: hsl(var(--macon-error));
-    color: hsl(4 90% 35%);
-    background: hsl(4 90% 96%);
-  }
-
-  /* Section Headers */
-  .macon-section {
+  /* App header */
+  .app-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: var(--spacing-4);
+    padding: 14px 20px;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    backdrop-filter: blur(10px);
+    background: rgba(10, 15, 28, .7);
   }
-
-  .macon-section-title {
-    @apply text-base font-semibold;
-  }
-
-  .macon-section-actions {
+  
+  .brand {
     display: flex;
-    gap: var(--spacing-3);
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .logo {
+    height: 32px;
+  }
+  
+  .actions .btn {
+    margin-left: 8px;
+  }
+
+  /* Container */
+  .container {
+    max-width: 1200px;
+    margin: 24px auto;
+    padding: 0 16px;
+  }
+
+  /* Panel */
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    box-shadow: var(--shadow);
+    margin-bottom: 18px;
+  }
+  
+  .panel h2 {
+    margin: 0 0 12px;
+  }
+  
+  .hint {
+    color: var(--muted);
+    margin-top: 8px;
+  }
+
+  /* Grid */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(220px, 1fr));
+    gap: 12px;
+  }
+  
+  .grid label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+  }
+
+  /* Inputs */
+  input, select, textarea {
+    padding: 10px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    background: #0b1222;
+    color: var(--text);
+    outline: none;
+  }
+  
+  input[readonly] {
+    opacity: .8;
+  }
+
+  /* Row layout */
+  .row {
+    display: flex;
+    gap: 16px;
+  }
+  
+  .toolbox {
+    flex: 0 0 360px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .group {
+    border: 1px dashed var(--border);
+    border-radius: 12px;
+    padding: 12px;
+    display: grid;
+    gap: 8px;
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .group .btn {
+    grid-column: span 1;
+  }
+  
+  .group .btn + .btn {
+    margin-left: 8px;
+  }
+  
+  .group label {
+    font-size: 13px;
+  }
+
+  /* Canvas */
+  .canvas-wrap {
+    flex: 1;
+    background: #0b1222;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+  }
+  
+  .legend {
+    position: absolute;
+    right: 10px;
+    bottom: 8px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  /* Table */
+  .table-wrap {
+    overflow: auto;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+  }
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  
+  th, td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    text-align: left;
+  }
+  
+  tbody tr:hover {
+    background: #0c162b;
+  }
+  
+  tbody tr.selected {
+    background: rgba(58, 164, 255, .15);
+    outline: 1px solid rgba(58, 164, 255, .4);
+  }
+
+  /* Buttons - exact from your example */
+  .btn {
+    border: none;
+    padding: 10px 14px;
+    border-radius: 12px;
+    cursor: pointer;
+    background: #172036;
+    color: var(--text);
+    transition: all 0.2s ease;
+  }
+  
+  .btn.primary {
+    background: linear-gradient(90deg, var(--primary), var(--primary-2));
+    color: #001122;
+    font-weight: 600;
+  }
+  
+  .btn.danger {
+    background: var(--danger);
+    color: #100;
+  }
+  
+  .btn:active {
+    transform: translateY(1px);
+  }
+
+  /* Code blocks */
+  .code {
+    white-space: pre-wrap;
+    background: #0b1222;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  /* Footer */
+  .footer {
+    opacity: .8;
+    text-align: center;
+    padding: 18px 12px;
+    color: var(--muted);
   }
 }
