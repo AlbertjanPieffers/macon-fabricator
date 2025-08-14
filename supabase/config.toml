@@ -9,3 +9,6 @@ max_rows = 1000
 
 [functions.machine-connector]
 verify_jwt = false
+
+[functions.ads-connector]
+verify_jwt = false
